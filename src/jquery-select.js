@@ -14,6 +14,14 @@
         this.element = element;
         this.$element = $(element);
         this.$options = this.$element.find('option');
+        this.$optgroups = this.$element.find('optgroup');
+        this.group = [];
+
+        if (this.$optgroups.length !== 0) {
+            $.each(this.$optgroup, function(i,v) {
+                this.group.push($(v).find('option'));
+            });
+        }
 
         if (this.$options.length !== 0) {
             meta.opts = {};
@@ -49,13 +57,15 @@
             $.each(this.options.opts,function(key,value) {
                 var $li = $('<li></li>').data('value',key).text(value);
 
-                if (self.value === value) {
+                if (self.value === key) {
                     $tpl.addClass('select-active');
                 }
 
-                self.$bar.append($li);
+                self.$content.append($li);
 
             });
+
+            this.$li = this.$content.find('li');
 
             this.$bar.on('click', function() {
                 if (self.opened === true) {
@@ -67,10 +77,11 @@
 
             this.$content.delegate('click', 'li', function() {
                 var value = $(this).data(value);
-
+                if (value === undefined) {
+                    return
+                }
                 self.set.call(self, value);
             });
-
         },
 
         show: function() {
@@ -82,16 +93,24 @@
             this.opened = false;
         },
         set: function(value) {
-            this.$content.find('li').removeClass('select-active');
-            
+            var self = this,
+                content;
+            this.$li.removeClass('select-active');
+
             $.each(this.$options, function(i, v) {
-                if ($(v).attr('value') === value)
+                if ($(v).attr('value') === value) {
+                    $(v).prop('selected', true);
+                }
+            });
+
+            $.each(this.$li, function(i,v) {
+                if ($(v).data('value') === value) {
+                    $(v).addClass('select-active');
+                    this.$bar.find('span').text($(v).text());
+                }
             });
 
             this.value = value;
-
-            this.$bar.find('span').text(this.value);
-
             this.hide();
         }
 
