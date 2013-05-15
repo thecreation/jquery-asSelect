@@ -13,7 +13,7 @@
             meta = {};
 
         this.element = element;
-        this.$element = $(element).css({display: 'none'});
+        this.$element = $(element).css({display: 'none'}) || $('<div></div>');
         this.$options = this.$element.find('option');
         this.$optgroups = this.$element.find('optgroup');
         this.state = {};
@@ -45,8 +45,13 @@
             });
         }
 
+        // I have to use delete to prevent overwrite defaults config
+        if ($.isEmptyObject(meta.state)) {
+            delete meta.state;
+        }
+
         // $.extend use true argument 
-        this.options = $.extend(true, {}, Select.defaults, options, meta);
+        this.options = $.extend({}, Select.defaults, options, meta);
         this.namespace = this.options.namespace;
         this.value = this.options.value;
         this.state = this.options.state;
