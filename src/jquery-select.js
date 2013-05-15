@@ -13,7 +13,7 @@
             meta = {};
 
         this.element = element;
-        this.$element = $(element);
+        this.$element = $(element).css({display: 'none'});
         this.$options = this.$element.find('option');
         this.$optgroups = this.$element.find('optgroup');
         this.state = {};
@@ -91,21 +91,38 @@
 
 
             this.$li = this.$content.find('li');
-            this.$bar.on('click', function() {
-                self.position.call(self);
+            
 
-                if (self.opened === true) {
-                    self.hide.call(self);
-                } else {
+            if (this.options.trigger === 'click') {
+                this.$bar.on('click', function() {
+                    self.position.call(self);
+
+                    if (self.opened === true) {
+                        self.hide.call(self);
+                    } else {
+                        self.show.call(self);
+                    }
+
+                    return false;
+                });
+            } else {
+                this.$bar.on('mouseenter.select', function() {
+                    self.position.call(self);
                     self.show.call(self);
-                }
+                    return false;
+                });
 
-                return false;
-            });
+                // when mouse leave from $bar or $content both can trigger mouseleave event
+                // this event acquired by their parent element $select 
+                this.$select.on('mouseleave.select', function() {
+                    self.hide.call(self);
+                    return false;
+                });
+            }
 
             this.$content.delegate('li', 'click', function() {
                 var value = $(this).data('value');
-                console.log('click')
+
                 if (value === undefined) {
                     return false;
                 }
@@ -195,6 +212,7 @@
 
     Select.defaults = {
         skin: 'simple',
+        trigger: 'click', // 'hover' or 'click'
         state: {
             a: 'beijing',
             b: 'fujian',

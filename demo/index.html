@@ -81,9 +81,24 @@
         <section>
             <h4>Default</h4>
             <pre class="has-example"><code class="language-javascript">
-$(".custom-select").select({
-    skin: 'simple'
-});
+&lt;select class="custom-select"&gt;
+    &lt;option value="a"&gt;beijing&lt;/option&gt;
+    &lt;option value="b"&gt;fujian&lt;/option&gt;
+    &lt;option value="c"&gt;zhejiang&lt;/option&gt;
+    &lt;option value="d"&gt;tianjin&lt;/option&gt;
+    &lt;option value="e"&gt;shanghai&lt;/option&gt;
+&lt;/select&gt;
+&lt;script&gt;                   
+    $(document).ready(function() {
+        $('.custom-select').select({
+            skin: 'simple',
+            onChange: function(instance) {
+                var value = instance.get();
+                $('&lt;div&gt;&lt;span&gt;value: &lt;/span&gt;' + value + '&lt;/div&gt;').prependTo($('.content1'));
+            }
+        });                        
+    });
+&lt;/script&gt;
             </code></pre>
             <div class="example">
                 <select class="custom-select">
@@ -99,7 +114,6 @@ $(".custom-select").select({
                             skin: 'simple',
                             onChange: function(instance) {
                                 var value = instance.get();
-                                console.log(value)
                                 $('<div><span>value: </span>' + value + '</div>').prependTo($('.content1'));
                             }
                         });                        
@@ -114,12 +128,33 @@ $(".custom-select").select({
             </div>
            
         </section>  
+
+
         <section>
             <h4>group options</h4>
             <pre class="has-example"><code class="language-javascript">
-$(".group-select").select({
-    skin: 'simple'
-});
+&lt;select class="group-select"&gt;
+    &lt;optgroup label="north"&gt;
+        &lt;option value="a"&gt;beijing&lt;/option&gt;
+        &lt;option value="b"&gt;fujian&lt;/option&gt;
+    &lt;/optgroup&gt;
+    &lt;optgroup label="east"&gt;
+        &lt;option value="c"&gt;zhejiang&lt;/option&gt;
+        &lt;option value="d"&gt;tianjin&lt;/option&gt;
+        &lt;option value="e"&gt;shanghai&lt;/option&gt;
+    &lt;/optgroup&gt;
+    &lt;optgroup label="south"&gt;
+        &lt;option value="f"&gt;jiangsu&lt;/option&gt;
+    &lt;/optgroup&gt;                    
+&lt;/select&gt;
+&lt;script&gt;                   
+    $(document).ready(function() {
+
+        $('.group-select').select({
+            skin: 'simple',
+        });                        
+    });
+&lt;/script&gt;
             </code></pre>
             <div class="example">
                 <select class="group-select">
@@ -145,6 +180,44 @@ $(".group-select").select({
                     });
                 </script>
             </div>
+        </section>  
+
+        <section>
+            <h4>hover trigger</h4>
+            <pre class="has-example"><code class="language-javascript">
+&lt;select class="hover-select"&gt;
+    &lt;option value="a"&gt;beijing&lt;/option&gt;
+    &lt;option value="b"&gt;fujian&lt;/option&gt;
+    &lt;option value="c"&gt;zhejiang&lt;/option&gt;
+    &lt;option value="d"&gt;tianjin&lt;/option&gt;
+    &lt;option value="e"&gt;shanghai&lt;/option&gt;
+&lt;/select&gt;
+&lt;script&gt;                   
+    $(document).ready(function() {
+        $('.hover-select').select({
+            trigger: 'hover'
+        });                        
+    });
+&lt;/script&gt;
+            </code></pre>
+            <div class="example">
+                <select class="hover-select">
+                    <option value="a">beijing</option>
+                    <option value="b">fujian</option>
+                    <option value="c">zhejiang</option>
+                    <option value="d">tianjin</option>
+                    <option value="e">shanghai</option>
+                </select>
+                <script>                   
+                    $(document).ready(function() {
+                        $('.hover-select').select({
+                            trigger: 'hover'
+                        });                        
+                    });
+                </script>
+            </div>
+
+           
         </section>  
         
 
