@@ -1,0 +1,27 @@
+.select {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.select .select-bar {
+  width: 100px;
+  color: white;
+  background-color: blue;
+}
+
+.select .select-content {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  background-color: green;
+}
+
+.select .select-content li {
+  display: block;
+}
+
+.select .select-content .select-group {
+  font-weight: 800;
+}
