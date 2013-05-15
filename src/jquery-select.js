@@ -19,7 +19,6 @@
         this.state = {};
 
         meta.state = {};
-        meta.value = '';
 
         if (this.$optgroups.length !== 0) {
             $.each(this.$optgroups, function(i, v) {
@@ -46,9 +45,13 @@
             });
         }
 
-        this.options = $.extend({}, Select.defaults, options, meta);
+        // $.extend use true argument 
+        this.options = $.extend(true, {}, Select.defaults, options, meta);
+        this.namespace = this.options.namespace;
         this.value = this.options.value;
         this.state = this.options.state;
+
+        console.log(this.state)
 
         // flag
         this.opened = false;
@@ -60,7 +63,7 @@
         constructor: Select,
         init: function() {
             var self = this,
-                tpl = '<div class="select ' + this.options.skin + '"><div class="select-bar"><span></span></div><ul class="select-content"></ul></div>';
+                tpl = '<div class="' + this.namespace + ' ' + this.options.skin + '"><div class="' + this.namespace +'-bar"><span></span></div><ul class="' + this.namespace +'-content"></ul></div>';
 
             this.$select = $(tpl);
             this.$bar = this.$select.find('.select-bar');
@@ -69,19 +72,19 @@
             $.each(this.state, function(key, value) {
 
                 if (typeof value === 'object') {
-                    var $group = $('<li class="select-group"></li>').text(key);
+                    var $group = $('<li class="' + self.namespace + '-group"></li>').text(key);
                     self.$content.append($group);
                     $.each(value, function(k, v) {
                         var $li = $('<li class="group-item"></li>').data('value', k).text(v);
                         if (self.value === key) {
-                            $li.addClass('select-active');
+                            $li.addClass(self.namespace + '-active');
                         }
                         self.$content.append($li);
                     });
                 } else {
                     var $li = $('<li></li>').data('value', key).text(value);
                     if (self.value === key) {
-                        $li.addClass('select-active');
+                        $li.addClass(self.namespace + '-active');
                     }
                     self.$content.append($li);
                 }
@@ -153,7 +156,7 @@
         set: function(value) {
             var self = this;
 
-            this.$li.removeClass('select-active');
+            this.$li.removeClass(this.namespace + '-active');
             this.value = value;
 
             $.each(this.$options, function(i, v) {
@@ -164,7 +167,7 @@
 
             $.each(this.$li, function(i, v) {
                 if ($(v).data('value') === value) {
-                    $(v).addClass('select-active');
+                    $(v).addClass(self.namespace + '-active');
                     self.$bar.find('span').text($(v).text());
 
                     if ($.isFunction(self.options.onChange)) {
@@ -211,8 +214,10 @@
     };
 
     Select.defaults = {
+        namespace: 'select',
         skin: 'simple',
         trigger: 'click', // 'hover' or 'click'
+        value: 'a',
         state: {
             a: 'beijing',
             b: 'fujian',
@@ -227,7 +232,7 @@
             var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
 
             return this.each(function() {
-                var api = $.data(this, 'check');
+                var api = $.data(this, 'select');
                 if (typeof api[method] === 'function') {
                     api[method].apply(api, method_arguments);
                 }
@@ -236,8 +241,8 @@
             var opts = options || {};
             opts.$group = this;
             return this.each(function() {
-                if (!$.data(this, 'check')) {
-                    $.data(this, 'check', new Select(this, opts));
+                if (!$.data(this, 'select')) {
+                    $.data(this, 'select', new Select(this, opts));
                 }
             });
         }

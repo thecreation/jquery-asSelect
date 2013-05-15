@@ -66,6 +66,9 @@
                 display: inline-block;
                 vertical-align: middle;
             }
+            #wrapper {
+                margin-bottom: 70px;
+            }
         </style>
     </head>
 <body>
@@ -212,6 +215,30 @@
                     $(document).ready(function() {
                         $('.hover-select').select({
                             trigger: 'hover'
+                        });                        
+                    });
+                </script>
+            </div>
+
+           
+        </section>  
+
+        <section>
+            <h4>build from blank div</h4>
+            <pre class="has-example"><code class="language-javascript">
+&lt;div class="blank-select"&gt;&lt;/div&gt;
+&lt;script&gt;                   
+    $(document).ready(function() {
+        $('.blank-select').select();                        
+    });
+&lt;/script&gt;
+            </code></pre>
+            <div class="example">
+                <div class="blank-select"></div>
+                <script>                   
+                    $(document).ready(function() {
+                        $('.blank-select').select({
+
                         });                        
                     });
                 </script>
