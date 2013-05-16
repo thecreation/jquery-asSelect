@@ -22,6 +22,10 @@
   display: block;
 }
 
+.select .select-content li a {
+  color: white;
+}
+
 .select .select-content .select-group {
   font-weight: 800;
 }

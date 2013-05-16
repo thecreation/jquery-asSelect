@@ -229,7 +229,22 @@
 &lt;div class="blank-select"&gt;&lt;/div&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.blank-select').select();                        
+        $('.blank-select').select({
+            status: {
+                a: {
+                    text: 'on',
+                    icon: 'icon-1'
+                },
+                b: {
+                    text: 'off',
+                    icon: 'icon-2'
+                },
+                c: {
+                    text: 'default',
+                    icon: 'icon-3'
+                }
+            }
+        });                               
     });
 &lt;/script&gt;
             </code></pre>
@@ -238,7 +253,20 @@
                 <script>                   
                     $(document).ready(function() {
                         $('.blank-select').select({
-
+                            status: {
+                                a: {
+                                    text: 'on',
+                                    icon: 'icon-1'
+                                },
+                                b: {
+                                    text: 'off',
+                                    icon: 'icon-2'
+                                },
+                                c: {
+                                    text: 'default',
+                                    icon: 'icon-3'
+                                }
+                            }
                         });                        
                     });
                 </script>

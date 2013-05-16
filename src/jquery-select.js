@@ -13,19 +13,22 @@
             meta = {};
 
         this.element = element;
-        this.$element = $(element).css({display: 'none'}) || $('<div></div>');
+        this.$element = $(element).css({
+            display: 'none'
+        }) || $('<div></div>');
         this.$options = this.$element.find('option');
         this.$optgroups = this.$element.find('optgroup');
-        this.state = {};
+        this.status = {};
 
-        meta.state = {};
+        meta.status = {};
 
         if (this.$optgroups.length !== 0) {
             $.each(this.$optgroups, function(i, v) {
                 var label = $(v).attr('label');
-                meta.state[label] = {};
+                meta.status[label] = {};
                 $.each($(v).find('option'), function(i, v) {
-                    meta.state[label][$(v).attr('value')] = $(v).text();
+                    meta.status[label][$(v).attr('value')] = {};
+                    meta.status[label][$(v).attr('value')].text = $(v).text();
                     if ($(v).prop('selected')) {
                         meta.value = $(v).attr('value');
                     }
@@ -33,30 +36,24 @@
             });
         }
 
+        // it's different from this.$options
         $opts = this.$element.find('> option');
 
         if ($opts.length !== 0) {
-
             $.each($opts, function(i, v) {
-                meta.state[$(v).attr('value')] = $(v).text();
+                meta.status[$(v).attr('value')] = {};
+                meta.status[$(v).attr('value')].text = $(v).text();
                 if ($(v).prop('selected')) {
                     meta.value = $(v).attr('value');
                 }
             });
         }
 
-        // I have to use delete to prevent overwrite defaults config
-        if ($.isEmptyObject(meta.state)) {
-            delete meta.state;
-        }
-
         // $.extend use true argument 
-        this.options = $.extend({}, Select.defaults, options, meta);
+        this.options = $.extend(true, {}, Select.defaults, options, meta);
         this.namespace = this.options.namespace;
         this.value = this.options.value;
-        this.state = this.options.state;
-
-        console.log(this.state)
+        this.status = this.options.status;
 
         // flag
         this.opened = false;
@@ -68,38 +65,41 @@
         constructor: Select,
         init: function() {
             var self = this,
-                tpl = '<div class="' + this.namespace + ' ' + this.options.skin + '"><div class="' + this.namespace +'-bar"><span></span></div><ul class="' + this.namespace +'-content"></ul></div>';
+                tpl = '<div class="' + this.namespace + ' ' + this.options.skin + '"><div class="' + this.namespace + '-bar"><span></span></div><ul class="' + this.namespace + '-content"></ul></div>';
 
             this.$select = $(tpl);
             this.$bar = this.$select.find('.select-bar');
-            this.$content = this.$select.find('.select-content').css({display: 'none'});
+            this.$content = this.$select.find('.select-content').css({
+                display: 'none'
+            });
 
-            $.each(this.state, function(key, value) {
+            $.each(this.status, function(key, value) {
 
-                if (typeof value === 'object') {
+                if (value.text) {
+                    var $li = $('<li><a></a></li>').data('value', key).find('a').text(value.text).end();
+                    console.log($li);
+                    if (self.value === key) {
+                        $li.addClass(self.namespace + '-active');
+                    }
+                    $('<i></i>').addClass(value.icon).appendTo($li);
+                    self.$content.append($li);
+                } else {
                     var $group = $('<li class="' + self.namespace + '-group"></li>').text(key);
                     self.$content.append($group);
                     $.each(value, function(k, v) {
-                        var $li = $('<li class="group-item"></li>').data('value', k).text(v);
+                        console.log(v)
+                        var $li = $('<li class="group-item"><a></a></li>').data('value', k).find('a').text(v.text).end();
                         if (self.value === key) {
                             $li.addClass(self.namespace + '-active');
                         }
                         self.$content.append($li);
                     });
-                } else {
-                    var $li = $('<li></li>').data('value', key).text(value);
-                    if (self.value === key) {
-                        $li.addClass(self.namespace + '-active');
-                    }
-                    self.$content.append($li);
                 }
             });
 
             this.$element.after(this.$select);
-
-
             this.$li = this.$content.find('li');
-            
+
 
             if (this.options.trigger === 'click') {
                 this.$bar.on('click', function() {
@@ -139,6 +139,7 @@
                 return false;
             });
 
+            console.log(this.value)
             this.set(this.value);
         },
 
@@ -146,7 +147,7 @@
             this.$content.css({
                 display: 'block'
             });
-            $(document).on('click.select',$.proxy(this.hide,this));
+            $(document).on('click.select', $.proxy(this.hide, this));
             this.opened = true;
         },
 
@@ -166,14 +167,16 @@
 
             $.each(this.$options, function(i, v) {
                 if ($(v).attr('value') === value) {
+                    console.log('comein')
                     $(v).prop('selected', true);
                 }
             });
 
             $.each(this.$li, function(i, v) {
+                
                 if ($(v).data('value') === value) {
                     $(v).addClass(self.namespace + '-active');
-                    self.$bar.find('span').text($(v).text());
+                    self.$bar.find('span').text($(v).find('a').text());
 
                     if ($.isFunction(self.options.onChange)) {
                         self.options.onChange(self);
@@ -181,7 +184,7 @@
                     self.$select.trigger('change', self);
                 }
             });
-            
+
             this.hide();
         },
 
@@ -202,7 +205,7 @@
             var height = this.$bar.outerHeight(true),
                 offset = this.$bar.offset(),
                 contentHeight = this.$content.height(),
-                top,bottom;
+                top;
 
             if (contentHeight + offset.top > $(window).height() + $(window).scrollTop()) {
                 top = -contentHeight;
@@ -223,11 +226,11 @@
         skin: 'simple',
         trigger: 'click', // 'hover' or 'click'
         value: 'a',
-        state: {
-            a: 'beijing',
-            b: 'fujian',
-            c: 'zhejiang'
-        },
+        // status: {
+        //     a: 'beijing',
+        //     b: 'fujian',
+        //     c: 'zhejiang'
+        // },
         onChange: function() {}
     };
 
