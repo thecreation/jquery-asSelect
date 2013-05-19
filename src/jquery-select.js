@@ -68,8 +68,8 @@
                 tpl = '<div class="' + this.namespace + ' ' + this.options.skin + '"><div class="' + this.namespace + '-bar"><span></span></div><ul class="' + this.namespace + '-content"></ul></div>';
 
             this.$select = $(tpl);
-            this.$bar = this.$select.find('.select-bar');
-            this.$content = this.$select.find('.select-content').css({
+            this.$bar = this.$select.find('.' + this.namespace +'-bar');
+            this.$content = this.$select.find('.' + this.namespace +'-content').css({
                 display: 'none'
             });
 
@@ -77,7 +77,6 @@
 
                 if (value.text) {
                     var $li = $('<li><a></a></li>').data('value', key).find('a').text(value.text).end();
-                    console.log($li);
                     if (self.value === key) {
                         $li.addClass(self.namespace + '-active');
                     }
@@ -87,7 +86,7 @@
                     var $group = $('<li class="' + self.namespace + '-group"></li>').text(key);
                     self.$content.append($group);
                     $.each(value, function(k, v) {
-                        console.log(v)
+                        
                         var $li = $('<li class="group-item"><a></a></li>').data('value', k).find('a').text(v.text).end();
                         if (self.value === key) {
                             $li.addClass(self.namespace + '-active');
@@ -139,7 +138,6 @@
                 return false;
             });
 
-            console.log(this.value)
             this.set(this.value);
         },
 
@@ -147,6 +145,7 @@
             this.$content.css({
                 display: 'block'
             });
+            this.$bar.addClass(this.namespace + '-active');
             $(document).on('click.select', $.proxy(this.hide, this));
             this.opened = true;
         },
@@ -155,6 +154,7 @@
             this.$content.css({
                 display: 'none'
             });
+            this.$bar.removeClass(this.namespace + '-active');
             $(document).off('click.select');
             this.opened = false;
         },
@@ -162,12 +162,11 @@
         set: function(value) {
             var self = this;
 
-            this.$li.removeClass(this.namespace + '-active');
+            this.$li.removeClass(this.namespace + '-item-active');
             this.value = value;
 
             $.each(this.$options, function(i, v) {
                 if ($(v).attr('value') === value) {
-                    console.log('comein')
                     $(v).prop('selected', true);
                 }
             });
@@ -175,7 +174,7 @@
             $.each(this.$li, function(i, v) {
                 
                 if ($(v).data('value') === value) {
-                    $(v).addClass(self.namespace + '-active');
+                    $(v).addClass(self.namespace + '-item-active');
                     self.$bar.find('span').text($(v).find('a').text());
 
                     if ($.isFunction(self.options.onChange)) {
@@ -208,9 +207,9 @@
                 top;
 
             if (contentHeight + offset.top > $(window).height() + $(window).scrollTop()) {
-                top = -contentHeight;
+                top = -contentHeight - parseInt(this.options.offset[0]);
             } else {
-                top = height;
+                top = height + parseInt(this.options.offset[0]);
             }
 
             this.$content.css({
@@ -226,6 +225,7 @@
         skin: 'simple',
         trigger: 'click', // 'hover' or 'click'
         value: 'a',
+        offset: [-10,0],
         // status: {
         //     a: 'beijing',
         //     b: 'fujian',
