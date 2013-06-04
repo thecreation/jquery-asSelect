@@ -68,8 +68,8 @@
                 tpl = '<div class="' + this.namespace + ' ' + this.options.skin + '"><div class="' + this.namespace + '-bar"><span></span></div><ul class="' + this.namespace + '-content"></ul></div>';
 
             this.$select = $(tpl);
-            this.$bar = this.$select.find('.' + this.namespace +'-bar');
-            this.$content = this.$select.find('.' + this.namespace +'-content').css({
+            this.$bar = this.$select.find('.' + this.namespace + '-bar');
+            this.$content = this.$select.find('.' + this.namespace + '-content').css({
                 display: 'none'
             });
 
@@ -86,7 +86,7 @@
                     var $group = $('<li class="' + self.namespace + '-group"></li>').text(key);
                     self.$content.append($group);
                     $.each(value, function(k, v) {
-                        
+
                         var $li = $('<li class="group-item"><a></a></li>').data('value', k).find('a').text(v.text).end();
                         if (self.value === key) {
                             $li.addClass(self.namespace + '-active');
@@ -172,7 +172,7 @@
             });
 
             $.each(this.$li, function(i, v) {
-                
+
                 if ($(v).data('value') === value) {
                     $(v).addClass(self.namespace + '-item-active');
                     self.$bar.find('span').text($(v).find('a').text());
@@ -207,9 +207,9 @@
                 top;
 
             if (contentHeight + offset.top > $(window).height() + $(window).scrollTop()) {
-                top = -contentHeight - parseInt(this.options.offset[0]);
+                top = -contentHeight - parseInt(this.options.offset[0], 10);
             } else {
-                top = height + parseInt(this.options.offset[0]);
+                top = height + parseInt(this.options.offset[0], 10);
             }
 
             this.$content.css({
@@ -225,7 +225,7 @@
         skin: 'simple',
         trigger: 'click', // 'hover' or 'click'
         value: 'a',
-        offset: [-10,0],
+        offset: [0, 0],
         // status: {
         //     a: 'beijing',
         //     b: 'fujian',
