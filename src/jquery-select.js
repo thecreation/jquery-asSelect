@@ -101,7 +101,7 @@
 
 
             if (this.options.trigger === 'click') {
-                this.$bar.on('click', function() {
+                this.$bar.on('click.select', function() {
                     self.position.call(self);
 
                     if (self.opened === true) {
@@ -140,7 +140,29 @@
 
             this.set(this.value);
         },
+        position: function() {
+            var height = this.$bar.outerHeight(true),
+                offset = this.$bar.offset(),
+                contentHeight = this.$content.height(),
+                top;
 
+            if (contentHeight + offset.top > $(window).height() + $(window).scrollTop()) {
+                top = -contentHeight - parseInt(this.options.offset[0], 10);
+            } else {
+                top = height + parseInt(this.options.offset[0], 10);
+            }
+
+            this.$content.css({
+                position: 'absolute',
+                top: top,
+                left: 0
+            });
+        },
+
+        /*
+            Public Method
+         */
+        
         show: function() {
             this.$content.css({
                 display: 'block'
@@ -148,8 +170,8 @@
             this.$bar.addClass(this.namespace + '-active');
             $(document).on('click.select', $.proxy(this.hide, this));
             this.opened = true;
+            return this;
         },
-
         hide: function() {
             this.$content.css({
                 display: 'none'
@@ -157,8 +179,8 @@
             this.$bar.removeClass(this.namespace + '-active');
             $(document).off('click.select');
             this.opened = false;
+            return this;
         },
-
         set: function(value) {
             var self = this;
 
@@ -186,7 +208,6 @@
 
             this.hide();
         },
-
         get: function() {
             var self = this,
                 value;
@@ -199,24 +220,18 @@
 
             return value;
         },
-
-        position: function() {
-            var height = this.$bar.outerHeight(true),
-                offset = this.$bar.offset(),
-                contentHeight = this.$content.height(),
-                top;
-
-            if (contentHeight + offset.top > $(window).height() + $(window).scrollTop()) {
-                top = -contentHeight - parseInt(this.options.offset[0], 10);
-            } else {
-                top = height + parseInt(this.options.offset[0], 10);
-            }
-
-            this.$content.css({
-                position: 'absolute',
-                top: top,
-                left: 0
-            });
+        enable: function() {
+            this.enabled = true;
+            this.$bar.addClass(this.namespace + 'enabled');
+            return this;
+        },
+        disable: function() {
+            this.enabled = false;
+            this.$bar.removeClass(this.namespace + 'enabled');
+            return this;
+        },
+        destroy: function() {
+            this.$bar.off('.select');
         }
     };
 
