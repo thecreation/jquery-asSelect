@@ -49,7 +49,6 @@
             });
         }
 
-        // $.extend use true argument 
         this.options = $.extend(true, {}, Select.defaults, options, meta);
         this.namespace = this.options.namespace;
         this.value = this.options.value;
@@ -77,20 +76,14 @@
 
                 if (value.text) {
                     var $li = $('<li><a></a></li>').data('value', key).find('a').text(value.text).end();
-                    if (self.value === key) {
-                        $li.addClass(self.namespace + '-active');
-                    }
                     $('<i></i>').addClass(value.icon).appendTo($li);
                     self.$content.append($li);
                 } else {
                     var $group = $('<li class="' + self.namespace + '-group"></li>').text(key);
                     self.$content.append($group);
-                    $.each(value, function(k, v) {
 
-                        var $li = $('<li class="group-item"><a></a></li>').data('value', k).find('a').text(v.text).end();
-                        if (self.value === key) {
-                            $li.addClass(self.namespace + '-active');
-                        }
+                    $.each(value, function(k, v) {
+                        var $li = $('<li class="' + self.namespace + '-group-item"><a></a></li>').data('value', k).find('a').text(v.text).end();
                         self.$content.append($li);
                     });
                 }
@@ -167,7 +160,7 @@
             this.$content.css({
                 display: 'block'
             });
-            this.$bar.addClass(this.namespace + '-active');
+            this.$bar.addClass(this.namespace + '_active');
             $(document).on('click.select', $.proxy(this.hide, this));
             this.opened = true;
             return this;
@@ -176,7 +169,7 @@
             this.$content.css({
                 display: 'none'
             });
-            this.$bar.removeClass(this.namespace + '-active');
+            this.$bar.removeClass(this.namespace + '_active');
             $(document).off('click.select');
             this.opened = false;
             return this;
@@ -184,7 +177,7 @@
         set: function(value) {
             var self = this;
 
-            this.$li.removeClass(this.namespace + '-item-active');
+            this.$li.removeClass(this.namespace + '_selected');
             this.value = value;
 
             $.each(this.$options, function(i, v) {
@@ -194,9 +187,8 @@
             });
 
             $.each(this.$li, function(i, v) {
-
                 if ($(v).data('value') === value) {
-                    $(v).addClass(self.namespace + '-item-active');
+                    $(v).addClass(self.namespace + '_selected');
                     self.$bar.find('span').text($(v).find('a').text());
 
                     if ($.isFunction(self.options.onChange)) {
