@@ -64,7 +64,7 @@
         constructor: Select,
         init: function() {
             var self = this,
-                tpl = '<div class="' + this.namespace + ' ' + this.options.skin + '"><div class="' + this.namespace + '-bar"><span></span></div><ul class="' + this.namespace + '-content"></ul></div>';
+                tpl = '<div class="' + this.namespace + ' ' + this.options.skin + '"><div class="' + this.namespace + '-bar"><span></span><i></i></div><ul class="' + this.namespace + '-content"></ul></div>';
 
             this.$select = $(tpl);
             this.$bar = this.$select.find('.' + this.namespace + '-bar');
