@@ -122,6 +122,7 @@
     $(document).ready(function() {
         $('.custom-select').select({
             skin: 'simple',
+            offset: [10,0],
             onChange: function(instance) {
                 var value = instance.get();
                 $('&lt;div&gt;&lt;span&gt;value: &lt;/span&gt;' + value + '&lt;/div&gt;').prependTo($('.content1'));
@@ -142,6 +143,7 @@
                     $(document).ready(function() {
                         $('.custom-select').select({
                             skin: 'simple',
+                            offset: [10,0],
                             
                             onChange: function(instance) {
                                 var value = instance.get();
