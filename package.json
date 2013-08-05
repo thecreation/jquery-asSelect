@@ -29,5 +29,8 @@
     "grunt": "~0.4.0",
     "grunt-jsbeautifier": "~0.1.5",
     "grunt-recess": "~0.3.1"
+  },
+  "dependencies": {
+    "grunt-text-replace": "~0.3.6"
   }
 }
