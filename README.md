@@ -96,8 +96,8 @@ $(".custom-select").select({
         <tr>
             <td>status</td>
             <td>{
-            a: 'beijing',
-            b: 'fujian',
+            a: 'beijing',<br/>
+            b: 'fujian',<br/>
             c: 'zhejiang'
           }</td>
             <td>Optional property, set the status of elements,for example <code>a:beijing</code> means the element's value is 'a',the text is 'beijing'</td>
