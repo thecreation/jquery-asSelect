@@ -1,12 +1,15 @@
 # jQuery select
 
-The powerful jQuery plugin that creates select. <a href="http://amazingsurge.github.io/jquery-select/">Project page and demos</a><br />
+The powerful jQuery plugin that creates a custom select. <a href="http://amazingsurge.github.io/jquery-select/">Project page and demos</a><br />
 Download: <a href="https://github.com/amazingSurge/jquery-select/archive/master.zip">jquery-select-master.zip</a>
 
 ***
 
 ## Features
 
+* **Extremely fast**
+* **Option group support**
+* **Javascript only 8KB compressed**
 * **Lightweight size** — 1 kb gzipped
 
 ## Dependencies
@@ -59,56 +62,34 @@ $(".custom-select").select({
 
 ## Settings
 
-<table>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>namespace</td>
-            <td>'.select'</td>
-            <td>Optional property,set a namspace for css class, for example, we have <code>.select_active</code> class for active effect, if namespace set to 'as-select', then it will be <code>.as-select_active</code></td>
-        </tr>
-        <tr>
-            <td>skin</td>
-            <td>"simple"</td>
-            <td>Optional property, set transition effect, it works after you load   specified skin file</td>
-        </tr>
-        <tr>
-            <td>trigger</td>
-            <td>'click'</td>
-            <td>Optional property, the way to active select, optioal 'hover'</td>
-        </tr>
-        <tr>
-            <td>value</td>
-            <td>'a'</td>
-            <td>Optional property, set the value of bar that element have no option when select initilized</td>
-        </tr>
-        <tr>
-            <td>offset</td>
-            <td>[0,0]</td>
-            <td>Optional property, set the offset between bar and comment</td>
-        </tr>
-        <tr>
-            <td>status</td>
-            <td>{
-            a: 'beijing',<br/>
-            b: 'fujian',<br/>
-            c: 'zhejiang'
-          }</td>
-            <td>Optional property, set the status of elements,for example <code>a:beijing</code> means the element's value is 'a',the text is 'beijing'</td>
-        </tr>
-        <tr>
-            <td>Onchange</td>
-            <td>function(){}</td>
-            <td>callback when element is seted refresh</td>
-        </tr>
-    </tbody>
-</table>
+```javascript
+    //Optional property,set a namspace for css class, for example, we have <code>.select_active</code> class for active effect, if namespace set to 'as-select', then it will be <code>.as-select_active</code>
+    namespace: '.select',
+
+    //Optional property, set transition effect, it works after you load specified skin file
+    skin: 'simple',
+
+    //Optional property, the way to active select, optioal 'hover
+    trigger: 'click',
+
+    //Optional property, set the value of bar that element have no option when select initilized
+    value: 'a',
+
+    //Optional property, set the offset between bar and comment
+    offset: [0,0]
+
+    //Optional property, set the status of elements,for example 
+    //<code>a:beijing</code> means the element's value is 'a',
+    //the text is 'beijing'
+    status: {
+         a: 'beijing',
+         b: 'fujian',
+         c: 'zhejiang'
+    },
+
+    //callback when element is seted refresh
+    Onchange: function(){}
+```
 
 ## Public methods
 
@@ -134,7 +115,6 @@ $(".custom-select").select("disable");
 
 // remove all event
 $(".custom-select").select("destroy");
-
 ```
 
 ## Event / Callback
@@ -158,12 +138,7 @@ Mobile browsers (like Opera mini, Chrome mobile, Safari mobile, Android browser 
 
 | Version | Notes                                                            |
 |---------|------------------------------------------------------------------|
-|   0.2.x | ([compare][compare-1.2]) add history function                    |
-|   0.1.x | ([compare][compare-1.1]) add keyboard function                   |
 |     ... | ...                                                              |
-
-[compare-1.2]: https://github.com/amazingSurge/jquery-select/compare/v1.2.0...v1.3.0
-[compare-1.1]: https://github.com/amazingSurge/jquery-select/compare/v1.1.0...v1.2.0
 
 ## Author
 [amazingSurge](http://amazingSurge.com)
