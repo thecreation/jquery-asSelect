@@ -9,7 +9,7 @@ Download: <a href="https://github.com/amazingSurge/jquery-select/archive/master.
 
 * **Extremely fast**
 * **Option group support**
-* **Javascript only 8KB compressed**
+* **Javascript only 4KB compressed**
 * **Lightweight size** — 1 kb gzipped
 
 ## Dependencies
@@ -63,7 +63,9 @@ $(".custom-select").select({
 ## Settings
 
 ```javascript
-    //Optional property,set a namspace for css class, for example, we have <code>.select_active</code> class for active effect, if namespace set to 'as-select', then it will be <code>.as-select_active</code>
+    //Optional property,set a namspace for css class, for example, we have <code>.select_active
+    //</code> class for active effect, if namespace set to 'as-select', then it will be <code>.
+    //as-select_active</code>
     namespace: '.select',
 
     //Optional property, set transition effect, it works after you load specified skin file
