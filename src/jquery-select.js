@@ -2,7 +2,7 @@
  * jquery-select
  * https://github.com/amazingSurge/jquery-select
  *
- * Copyright (c) 2013 joeylin
+ * Copyright (c) 2013 amazingSurge
  * Licensed under the MIT license.
  */
 
@@ -53,9 +53,11 @@
         this.namespace = this.options.namespace;
         this.value = this.options.value;
         this.status = this.options.status;
+        this.disbaled = this.options.disbaled || false;
 
         // flag
         this.opened = false;
+        this.eventBinded = false;
 
         this.init();
     };
@@ -64,37 +66,51 @@
         constructor: Select,
         init: function() {
             var self = this,
-                tpl = '<div class="' + this.namespace + ' ' + this.options.skin + '"><div class="' + this.namespace + '-bar"><span></span><i></i></div><ul class="' + this.namespace + '-content"></ul></div>';
+                tpl = '<div class="' + this.namespace + '"><div class="' + this.namespace + '-trigger"><span></span><i></i></div><ul class="' + this.namespace + '-dropdown"></ul></div>';
 
-            this.$select = $(tpl);
-            this.$bar = this.$select.find('.' + this.namespace + '-bar');
-            this.$content = this.$select.find('.' + this.namespace + '-content').css({
+            this.$select = $(tpl).css({position:'relative'});
+            this.$trigger = this.$select.find('.' + this.namespace + '-trigger');
+            this.$dropdown = this.$select.find('.' + this.namespace + '-dropdown').css({
                 display: 'none'
             });
 
-            $.each(this.status, function(key, value) {
+            if (this.options.skin !== null) {
+                this.$select.addClass(this.namespace + '_' + this.options.skin);
+            }
 
+            $.each(this.status, function(key, value) {
                 if (value.text) {
                     var $li = $('<li><a></a></li>').data('value', key).find('a').text(value.text).end();
                     $('<i></i>').addClass(value.icon).appendTo($li);
-                    self.$content.append($li);
+                    self.$dropdown.append($li);
                 } else {
                     var $group = $('<li class="' + self.namespace + '-group"></li>').text(key);
-                    self.$content.append($group);
+                    self.$dropdown.append($group);
 
                     $.each(value, function(k, v) {
                         var $li = $('<li class="' + self.namespace + '-group-item"><a></a></li>').data('value', k).find('a').text(v.text).end();
-                        self.$content.append($li);
+                        self.$dropdown.append($li);
                     });
                 }
             });
 
             this.$element.after(this.$select);
-            this.$li = this.$content.find('li');
+            this.$li = this.$dropdown.find('li');
 
+            if (this.options.disbaled === true) {
+                this.$trigger.addClass(this.namespace + '_disbaled');
+            } else {
+                this.bindEvent();
+            }
+
+            this.set(this.value);
+            this.$element.trigger('select::ready', this);
+        },
+        bindEvent: function() {
+            var self = this;
 
             if (this.options.trigger === 'click') {
-                this.$bar.on('click.select', function() {
+                this.$trigger.on('click.select', function() {
                     self.position.call(self);
 
                     if (self.opened === true) {
@@ -106,13 +122,13 @@
                     return false;
                 });
             } else {
-                this.$bar.on('mouseenter.select', function() {
+                this.$trigger.on('mouseenter.select', function() {
                     self.position.call(self);
                     self.show.call(self);
                     return false;
                 });
 
-                // when mouse leave from $bar or $content both can trigger mouseleave event
+                // when mouse leave from $trigger or $dropdown both can trigger mouseleave event
                 // this event acquired by their parent element $select 
                 this.$select.on('mouseleave.select', function() {
                     self.hide.call(self);
@@ -120,9 +136,14 @@
                 });
             }
 
-            this.$content.delegate('li', 'click', function() {
+            this.$dropdown.delegate('li', 'mouseenter.select', function() {
+                self.$element.trigger('select::option::mouseenter', self);
+                return false;
+            }).delegate('li', 'mouseleave.select', function() {
+                self.$element.trigger('select::option::mouseleave', self);
+                return false;
+            }).delegate('li', 'click.select', function() {
                 var value = $(this).data('value');
-
                 if (value === undefined) {
                     return false;
                 }
@@ -130,13 +151,18 @@
                 self.set.call(self, value);
                 return false;
             });
-
-            this.set(this.value);
+            this.eventBinded = true;
+        },
+        unbindEvent: function() {
+            this.$dropdown.undelegate('.select');
+            this.$trigger.off('.select');
+            this.$select.off('.select');
+            this.eventBinded = false;
         },
         position: function() {
-            var height = this.$bar.outerHeight(true),
-                offset = this.$bar.offset(),
-                contentHeight = this.$content.height(),
+            var height = this.$trigger.outerHeight(true),
+                offset = this.$trigger.offset(),
+                contentHeight = this.$dropdown.height(),
                 top;
 
             if (contentHeight + offset.top > $(window).height() + $(window).scrollTop()) {
@@ -145,34 +171,11 @@
                 top = height + parseInt(this.options.offset[0], 10);
             }
 
-            this.$content.css({
+            this.$dropdown.css({
                 position: 'absolute',
                 top: top,
                 left: 0
             });
-        },
-
-        /*
-            Public Method
-         */
-        
-        show: function() {
-            this.$content.css({
-                display: 'block'
-            });
-            this.$bar.addClass(this.namespace + '_active');
-            $(document).on('click.select', $.proxy(this.hide, this));
-            this.opened = true;
-            return this;
-        },
-        hide: function() {
-            this.$content.css({
-                display: 'none'
-            });
-            this.$bar.removeClass(this.namespace + '_active');
-            $(document).off('click.select');
-            this.opened = false;
-            return this;
         },
         set: function(value) {
             var self = this;
@@ -189,7 +192,7 @@
             $.each(this.$li, function(i, v) {
                 if ($(v).data('value') === value) {
                     $(v).addClass(self.namespace + '_selected');
-                    self.$bar.find('span').text($(v).find('a').text());
+                    self.$trigger.find('span').text($(v).find('a').text());
 
                     if ($.isFunction(self.options.onChange)) {
                         self.options.onChange(self);
@@ -199,6 +202,7 @@
             });
 
             this.hide();
+            this.$element.trigger('select::change', this);
         },
         get: function() {
             var self = this,
@@ -212,24 +216,57 @@
 
             return value;
         },
+
+        /*
+            Public Method
+         */
+        
+        show: function() {
+            this.$dropdown.css({
+                display: 'block'
+            });
+            this.$trigger.addClass(this.namespace + '_active');
+            $(document).on('click.select', $.proxy(this.hide, this));
+            this.opened = true;
+            this.$element.trigger('select::show', this);
+            return this;
+        },
+        hide: function() {
+            this.$dropdown.css({
+                display: 'none'
+            });
+            this.$trigger.removeClass(this.namespace + '_active');
+            $(document).off('click.select');
+            this.opened = false;
+            this.$element.trigger('select::hide', this);
+            return this;
+        },
+        val: function(value) {
+            if (value) {
+                this.set(value);
+                return this;
+            } else {
+                return this.get();
+            }
+        },
         enable: function() {
-            this.enabled = true;
-            this.$bar.addClass(this.namespace + 'enabled');
+            this.disbaled = false;
+            this.$trigger.removeClass(this.namespace + '_disbaled');
             return this;
         },
         disable: function() {
-            this.enabled = false;
-            this.$bar.removeClass(this.namespace + 'enabled');
+            this.disbaled = true;
+            this.$trigger.addClass(this.namespace + '_disbaled');
             return this;
         },
         destroy: function() {
-            this.$bar.off('.select');
+            this.$trigger.off('.select');
         }
     };
 
     Select.defaults = {
         namespace: 'select',
-        skin: 'simple',
+        skin: null,
         trigger: 'click', // 'hover' or 'click'
         value: 'a',
         offset: [0, 0],

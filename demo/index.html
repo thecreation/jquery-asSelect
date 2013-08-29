@@ -122,7 +122,7 @@
     $(document).ready(function() {
         $('.custom-select').select({
             skin: 'simple',
-            offset: [10,0],
+            offset: [0,0],
             onChange: function(instance) {
                 var value = instance.get();
                 $('&lt;div&gt;&lt;span&gt;value: &lt;/span&gt;' + value + '&lt;/div&gt;').prependTo($('.content1'));
@@ -143,12 +143,31 @@
                     $(document).ready(function() {
                         $('.custom-select').select({
                             skin: 'simple',
-                            offset: [10,0],
-                            
-                            onChange: function(instance) {
-                                var value = instance.get();
-                                $('<div><span>value: </span>' + value + '</div>').prependTo($('.content1'));
-                            }
+                            offset: [0,0]
+                        }); 
+                        $('.custom-select').on('select::trigger', function(event, instance) {
+                            var text = event.type + ': triggered';
+                            $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
+                        }); 
+                        $('.custom-select').on('select::change', function(event, instance) {
+                            var text = event.type + ': triggered;' + ' value: ' + instance.val();
+                            $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
+                        }); 
+                        $('.custom-select').on('select::show', function(event, instance) {
+                            var text = event.type + ': triggered';
+                            $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
+                        }); 
+                        $('.custom-select').on('select::hide', function(event, instance) {
+                            var text = event.type + ': triggered';
+                            $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
+                        }); 
+                        $('.custom-select').on('select::option::mouseenter', function(event, instance) {
+                            var text = event.type + ': triggered';
+                            $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
+                        }); 
+                        $('.custom-select').on('select::option::mouseleave', function(event, instance) {
+                            var text = event.type + ': triggered';
+                            $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         });                        
                     });
                 </script>
@@ -156,7 +175,7 @@
 
             <div class="example info">
                 <div id="infobar">
-                    <div class="content1"></div>
+                    <div class="consoleEvent"></div>
                 </div>
             </div>
            
