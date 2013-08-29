@@ -4,13 +4,13 @@
   left: 0;
 }
 
-.select .select-bar {
+.select .select-trigger {
   width: 100px;
   color: white;
   background-color: blue;
 }
 
-.select .select-content {
+.select .select-dropdown {
   position: absolute;
   padding: 0;
   margin: 0;
@@ -18,14 +18,14 @@
   background-color: green;
 }
 
-.select .select-content li {
+.select .select-dropdown li {
   display: block;
 }
 
-.select .select-content li a {
+.select .select-dropdown li a {
   color: white;
 }
 
-.select .select-content .select-group {
+.select .select-dropdown .select-group {
   font-weight: 800;
 }
