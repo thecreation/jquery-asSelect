@@ -162,7 +162,7 @@
         position: function() {
             var height = this.$trigger.outerHeight(true),
                 offset = this.$trigger.offset(),
-                contentHeight = this.$dropdown.height(),
+                contentHeight = this.$dropdown.outerHeight(true),
                 top;
 
             if (contentHeight + offset.top > $(window).height() + $(window).scrollTop()) {
@@ -269,7 +269,7 @@
         skin: null,
         trigger: 'click', // 'hover' or 'click'
         value: 'a',
-        offset: [0, 0],
+        offset: [10, 0],
         // status: {
         //     a: 'beijing',
         //     b: 'fujian',
