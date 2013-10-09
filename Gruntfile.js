@@ -104,7 +104,7 @@ module.exports = function(grunt) {
                 }]
             },
             jquery: {
-                src: ['tabs.jquery.json'],
+                src: ['select.jquery.json'],
                 overwrite: true, // overwrite matched source files
                 replacements: [{
                     from: /("version": ")([0-9\.]+)(")/g,
@@ -126,9 +126,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-recess');
 
     // Default task.
-    grunt.registerTask('default', ['jshint', 'qunit', 'clean', 'concat', 'uglify']);
+    grunt.registerTask('default', ['jshint', 'qunit', 'clean', 'concat', 'uglify','replace:jquery','replace:bower']);
 
-    grunt.registerTask('dist', ['concat', 'uglify']);
+    grunt.registerTask('dist', ['concat', 'uglify','replace:bower']);
 
     grunt.registerTask('js', ['jsbeautifier', 'jshint']);
     grunt.registerTask('css', ['recess']);
