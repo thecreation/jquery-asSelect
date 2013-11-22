@@ -55,6 +55,16 @@
         this.status = this.options.status;
         this.disbaled = this.options.disbaled || false;
 
+        this.classes = {
+            dropdown: this.namespace + '-dropdown',
+            trigger: this.namespace + '-trigger',
+            show: this.namespace + '_show',
+            skin: this.namespace + '_' + this.options.skin,
+            disbaled: this.namespace + '_disbaled',
+            selected: this.namespace + '_selected',
+            active: this.namespace + '-active'
+        };
+
         // flag
         this.opened = false;
         this.eventBinded = false;
@@ -66,22 +76,22 @@
         constructor: Select,
         init: function() {
             var self = this,
-                tpl = '<div class="' + this.namespace + '"><div class="' + this.namespace + '-trigger"><span></span><i></i></div><ul class="' + this.namespace + '-dropdown"></ul></div>';
+                tpl = '<div class="' + this.namespace + '"><div class="' + this.classes.trigger + '"><span></span><i></i></div><ul class="' + this.classes.dropdown + '"></ul></div>';
 
-            this.$select = $(tpl).css({position:'relative'});
-            this.$trigger = this.$select.find('.' + this.namespace + '-trigger');
-            this.$dropdown = this.$select.find('.' + this.namespace + '-dropdown').css({
-                display: 'none'
-            });
+            this.$select = $(tpl);
+            this.$trigger = this.$select.find('.' + this.classes.trigger);
+            this.$dropdown = this.$select.find('.' + this.classes.dropdown);
 
-            if (this.options.skin !== null) {
-                this.$select.addClass(this.namespace + '_' + this.options.skin);
+            if (this.options.skin) {
+                this.$select.addClass(this.classes.skin);
             }
 
             $.each(this.status, function(key, value) {
                 if (value.text) {
                     var $li = $('<li><a></a></li>').data('value', key).find('a').text(value.text).end();
-                    $('<i></i>').addClass(value.icon).appendTo($li);
+                    if (value.icon) {
+                        $('<i></i>').addClass(value.icon).appendTo($li);
+                    }
                     self.$dropdown.append($li);
                 } else {
                     var $group = $('<li class="' + self.namespace + '-group"></li>').text(key);
@@ -89,6 +99,9 @@
 
                     $.each(value, function(k, v) {
                         var $li = $('<li class="' + self.namespace + '-group-item"><a></a></li>').data('value', k).find('a').text(v.text).end();
+                        if (v.icon) {
+                            $('<i></i>').addClass(v.icon).appendTo($li);
+                        }
                         self.$dropdown.append($li);
                     });
                 }
@@ -97,11 +110,11 @@
             this.$element.after(this.$select);
             this.$li = this.$dropdown.find('li');
 
-            if (this.options.disbaled === true) {
-                this.$trigger.addClass(this.namespace + '_disbaled');
-            } else {
-                this.bindEvent();
-            }
+            if (this.options.disbaled) {
+                this.$trigger.addClass(this.classes.disbaled);
+            } 
+
+            this.bindEvent();
 
             this.set(this.value);
             this.$element.trigger('select::ready', this);
@@ -136,13 +149,13 @@
                 });
             }
 
-            this.$dropdown.delegate('li', 'mouseenter.select', function() {
+            this.$dropdown.on('li', 'mouseenter.select', function() {
                 self.$element.trigger('select::option::mouseenter', self);
                 return false;
-            }).delegate('li', 'mouseleave.select', function() {
+            }).on('li', 'mouseleave.select', function() {
                 self.$element.trigger('select::option::mouseleave', self);
                 return false;
-            }).delegate('li', 'click.select', function() {
+            }).on('li', 'click.select', function() {
                 var value = $(this).data('value');
                 if (value === undefined) {
                     return false;
@@ -154,7 +167,7 @@
             this.eventBinded = true;
         },
         unbindEvent: function() {
-            this.$dropdown.undelegate('.select');
+            this.$dropdown.off('.select');
             this.$trigger.off('.select');
             this.$select.off('.select');
             this.eventBinded = false;
@@ -172,15 +185,13 @@
             }
 
             this.$dropdown.css({
-                position: 'absolute',
                 top: top,
-                left: 0
             });
         },
         set: function(value) {
             var self = this;
 
-            this.$li.removeClass(this.namespace + '_selected');
+            this.$li.removeClass(this.classes.selected);
             this.value = value;
 
             $.each(this.$options, function(i, v) {
@@ -191,13 +202,13 @@
 
             $.each(this.$li, function(i, v) {
                 if ($(v).data('value') === value) {
-                    $(v).addClass(self.namespace + '_selected');
+                    $(v).addClass(self.classes.selected);
                     self.$trigger.find('span').text($(v).find('a').text());
 
                     if ($.isFunction(self.options.onChange)) {
-                        self.options.onChange(self);
+                        self.options.onChange.call(self,value);
                     }
-                    self.$select.trigger('change', self);
+                    self.$select.trigger('change', value);
                 }
             });
 
@@ -225,7 +236,8 @@
             this.$dropdown.css({
                 display: 'block'
             });
-            this.$trigger.addClass(this.namespace + '_active');
+            this.$trigger.addClass(this.classes.active);
+            this.$dropdown.addClass(this.classes.show);
             $(document).on('click.select', $.proxy(this.hide, this));
             this.opened = true;
             this.$element.trigger('select::show', this);
@@ -235,7 +247,8 @@
             this.$dropdown.css({
                 display: 'none'
             });
-            this.$trigger.removeClass(this.namespace + '_active');
+            this.$trigger.removeClass(this.classes.active);
+            this.$dropdown.removeClass(this.classes.show);
             $(document).off('click.select');
             this.opened = false;
             this.$element.trigger('select::hide', this);
@@ -251,16 +264,17 @@
         },
         enable: function() {
             this.disbaled = false;
-            this.$trigger.removeClass(this.namespace + '_disbaled');
+            this.$trigger.removeClass(this.classes.disbaled);
             return this;
         },
         disable: function() {
             this.disbaled = true;
-            this.$trigger.addClass(this.namespace + '_disbaled');
+            this.$trigger.addClass(this.classes.disbaled);
             return this;
         },
         destroy: function() {
             this.$trigger.off('.select');
+            this.$select.remove();
         }
     };
 
@@ -269,7 +283,7 @@
         skin: null,
         trigger: 'click', // 'hover' or 'click'
         value: 'a',
-        offset: [10, 0],
+        offset: [0, 0],
         // status: {
         //     a: 'beijing',
         //     b: 'fujian',
