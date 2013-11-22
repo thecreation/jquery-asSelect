@@ -137,5 +137,4 @@ module.exports = function(grunt) {
         'replace:bower',
         'replace:jquery'
     ]);
-
 };
