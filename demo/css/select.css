@@ -1,14 +1,116 @@
-.select {
-  position: relative;
-  top: 0;
-  left: 0;
-}
+/* core */
+.select-wrapper {
+	position: relative;
 
-.select .select-dropdown {
-  position: absolute;
-  display: none;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
 }
-
-.select_show {
-  display: block;
+.select_disabled { 
+	cursor: default; 
+	-webkit-touch-callout: none; 
+	-webkit-user-select: none; 
+	-moz-user-select: none; 
+	-ms-user-select: none; 
+	user-select: none; 
+}
+.select-old { 
+	position: relative; 
+	overflow: hidden; 
+}
+.select-old select { 
+	position: absolute; 
+	left: -100%;
+}
+.select-label {
+	white-space: nowrap; 
+	overflow: hidden;
+}
+.select-dropdown {
+	position: absolute;
+	display: none;
+	overflow: auto; 
+	top: 100%; 
+	left: 0;
+}
+.select_open .select-dropdown {
+	display: block;
+}
+.select-dropdown ul,
+.select-dropdown li { 
+	list-style: none;
+}
+.select-dropdown li { 
+	cursor: pointer; 
+	display: block; 
+}
+/* skin */
+.select-wrapper { 
+	margin: 0 0 10px; 
+	width: 300px; 
+}
+.select_disabled { 
+	filter: alpha(opacity=50); 
+	opacity: 0.5;
+}
+.select_open .select-dropdown {
+	z-index: 9999; 
+}
+.select-trigger {
+	border: 1px solid #cccccc; 
+	background: #fafafa; 
+	border-radius: 3px; 
+}
+.select_open .select-trigger { 
+	border-color: #bbbbbb; 
+	background: #f5f5f5; 
+	z-index: 9999;
+}
+.select-label { 
+	margin: 0 30px 0 0; 
+	padding: 6px; 
+	font-size: 12px; 
+	line-height: 1.5; 
+	color: #555555; 
+}
+.select-handler { 
+	
+}
+.select-wrapper:hover .select-trigger { 
+	border-color: #bbbbbb;
+}
+.select-dropdown ul,
+.select-dropdown li {
+	padding: 0; 
+	margin: 0; 
+	min-height: 20px;
+	line-height: 20px;
+	font-size: 12px;
+}
+.select-dropdown {
+	background: #fcfcfc; 
+	border: 1px solid #cccccc;
+	z-index: 9998; 
+	box-shadow: 0 0 10px -6px; 
+}
+.select-dropdown li.select-item { 
+	padding: 5px; 
+	border-bottom: 1px solid #eeeeee; 
+	color: #666; 
+	border-top: 1px solid #ffffff; 
+}
+.select-group-label { 
+	font-weight: bold;
+	background-color: #f0f0f0;
+	padding: 3px;
+}
+.select-dropdown li.select_selected { 
+	background: #EFEFEF; 
+	color: #444; 
+	border-top-color: #eeeeee; 
+}
+.select-dropdown li.select-item:hover { 
+	background: #f5f5f5; 
+	color: #444; 
 }

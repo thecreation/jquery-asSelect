@@ -9,65 +9,39 @@
 (function($) {
 
     var Select = $.select = function(element, options) {
-        var $opts,
-            meta = {};
-
         this.element = element;
-        this.$element = $(element).css({
-            display: 'none'
-        }) || $('<div></div>');
-        this.$options = this.$element.find('option');
-        this.$optgroups = this.$element.find('optgroup');
-        this.status = {};
-
-        meta.status = {};
-
-        if (this.$optgroups.length !== 0) {
-            $.each(this.$optgroups, function(i, v) {
-                var label = $(v).attr('label');
-                meta.status[label] = {};
-                $.each($(v).find('option'), function(i, v) {
-                    meta.status[label][$(v).attr('value')] = {};
-                    meta.status[label][$(v).attr('value')].text = $(v).text();
-                    if ($(v).prop('selected')) {
-                        meta.value = $(v).attr('value');
-                    }
-                });
-            });
-        }
-
-        // it's different from this.$options
-        $opts = this.$element.find('> option');
-
-        if ($opts.length !== 0) {
-            $.each($opts, function(i, v) {
-                meta.status[$(v).attr('value')] = {};
-                meta.status[$(v).attr('value')].text = $(v).text();
-                if ($(v).prop('selected')) {
-                    meta.value = $(v).attr('value');
-                }
-            });
-        }
-
-        this.options = $.extend(true, {}, Select.defaults, options, meta);
+        this.$select = $(element);
+        this.options = $.extend(true, {}, Select.defaults, options);
         this.namespace = this.options.namespace;
-        this.value = this.options.value;
-        this.status = this.options.status;
-        this.disbaled = this.options.disbaled || false;
+        
+        this.disabled = this.options.disabled;
+        if(this.$select.prop('disabled')){
+            this.disabled = true;
+        }
+        this.selected = null;
 
         this.classes = {
+            wrapper: this.namespace + '-wrapper',
+            old: this.namespace + '-old',
             dropdown: this.namespace + '-dropdown',
             trigger: this.namespace + '-trigger',
-            show: this.namespace + '_show',
+            label: this.namespace + '-label',
+            handler: this.namespace + '-handler',
             skin: this.namespace + '_' + this.options.skin,
-            disbaled: this.namespace + '_disbaled',
+            open: this.namespace + '_open',
+            disabled: this.namespace + '_disabled',
             selected: this.namespace + '_selected',
-            active: this.namespace + '-active'
+            focus: this.namespace + '_focus',
+            loading: this.namespace + '_loading',
+            item: this.namespace +'-item',
+            group: this.namespace +'-group'
         };
 
         // flag
         this.opened = false;
         this.eventBinded = false;
+        this.inFocus = true;
+        this.loading = 0;
 
         this.init();
     };
@@ -75,101 +49,253 @@
     Select.prototype = {
         constructor: Select,
         init: function() {
-            var self = this,
-                tpl = '<div class="' + this.namespace + '"><div class="' + this.classes.trigger + '"><span></span><i></i></div><ul class="' + this.classes.dropdown + '"></ul></div>';
+            var self = this;
 
-            this.$select = $(tpl);
-            this.$trigger = this.$select.find('.' + this.classes.trigger);
-            this.$dropdown = this.$select.find('.' + this.classes.dropdown);
+            this.$wrapper = this.$select.wrap('<div class="'+this.classes.wrapper+'"><div class="'+this.classes.old+'" /></div>').parent().parent();
+
+            this.$trigger = $('<div class="' + this.classes.trigger + '"><div class="'+ this.classes.handler +'"></div></div>');
+            this.$label = $('<div class="'+this.classes.label +'">'+this.options.render.label()+'</div>').prependTo(this.$trigger);
+            this.$dropdown = $('<div class="' + this.classes.dropdown + '"><ul></ul></div>');
+            this.$ul = this.$dropdown.children('ul');
+
+            this.$wrapper.append(this.$trigger).append(this.$dropdown);
 
             if (this.options.skin) {
-                this.$select.addClass(this.classes.skin);
+                this.$wrapper.addClass(this.classes.skin);
             }
 
-            $.each(this.status, function(key, value) {
-                if (value.text) {
-                    var $li = $('<li><a></a></li>').data('value', key).find('a').text(value.text).end();
-                    if (value.icon) {
-                        $('<i></i>').addClass(value.icon).appendTo($li);
-                    }
-                    self.$dropdown.append($li);
-                } else {
-                    var $group = $('<li class="' + self.namespace + '-group"></li>').text(key);
-                    self.$dropdown.append($group);
+            if (this.options.disabled) {
+                this.$trigger.addClass(this.classes.disabled);
+            }
 
-                    $.each(value, function(k, v) {
-                        var $li = $('<li class="' + self.namespace + '-group-item"><a></a></li>').data('value', k).find('a').text(v.text).end();
-                        if (v.icon) {
-                            $('<i></i>').addClass(v.icon).appendTo($li);
-                        }
-                        self.$dropdown.append($li);
+            self.data = this.selectToData();
+
+            self.refreshOptions();
+
+            self.attachEvents();
+
+            self.select(self.$select.val());
+
+            self.$select.trigger('select::ready', self);
+
+            if (self.options.preload) {
+                self.onLoad();
+            }
+        },
+
+        selectToData: function(){
+            var self = this;
+            var data = [];
+
+            var optionToData = function(){
+                return $.extend({},$(this).data(),{
+                    'value': this.value,
+                    'text':  this.text,
+                    'slug': self.replaceDiacritics(this.text)
+               });
+            }
+
+            this.$select.children().each(function(){
+                if( this.tagName.toLowerCase() === 'optgroup' ){
+                    var group = $.extend({},$(this).data(),{
+                        'group': true,
+                        'label': this.label,
+                        'options': []
                     });
+
+                    $(this).children().each(function(){
+                        group.options.push(optionToData.call(this));
+                    });
+                    data.push(group);
+                } else {
+                   data.push(optionToData.call(this));
+                }
+            });
+            return data;
+        },
+        addToData: function(data){
+            var self = this;
+            if($.isArray(data)){
+                $.each(data, function(i, item){
+                    if(!item.group){
+                        data[i].slug = self.replaceDiacritics(item.text);
+                    }
+                });
+                this.data = this.data.concat(data);
+            }
+        },
+        addToSelect: function(data){            
+            var self = this;
+            var html = '';
+            var buildOption = function(item){
+                if(item.value === self.selected){
+                    return '<option value="'+item.value+'" selected="selected">'+ item.text + '</option>';
+                } else {
+                    return '<option value="'+item.value+'">' + item.text + '</option>';
+                }
+            }
+            if($.isArray(data)){
+                $.each(data, function(i, item){
+                    if(item.group){
+                        html += '<optgroup label="'+item.label+'">';
+                            if($.isArray(item.options)){
+                                $.each(item.options, function(j, option){
+                                    html += buildOption(option);
+                                });
+                            }
+                        html += '</optgroup>';
+                    } else {
+                        html += buildOption(item);
+                    }
+                });
+            }
+            self.$select.append(html);
+        },
+        refreshOptions: function(){
+            var html = '';
+            var self = this;
+            var buildOption = function(item){
+                if(item.value === self.selected){
+                    return '<li class="'+self.classes.item+' '+self.classes.selected+'">'+ self.options.render.option.call(self, item) + '</li>';
+                } else {
+                    return '<li class="'+self.classes.item+'">' + self.options.render.option.call(self, item) + '</li>';
+                }
+            }
+            $.each(self.data, function(i, item){
+                if(item.group){
+                    html += '<li class="' + self.classes.group + '">';
+
+                    html += '<div class="'+ self.namespace+'-group-label">' + self.options.render.group.call(self, item)+'</div>';
+                    html += '<ul>';
+                    if($.isArray(item.options)){
+                        $.each(item.options, function(j, option){
+                            html += buildOption(option);
+                        });
+                    }
+                    html += '</ul>';
+                    html += '</li>';
+                } else {
+                    html += buildOption(item);
                 }
             });
 
-            this.$element.after(this.$select);
-            this.$li = this.$dropdown.find('li');
-
-            if (this.options.disbaled) {
-                this.$trigger.addClass(this.classes.disbaled);
-            } 
-
-            this.bindEvent();
-
-            this.set(this.value);
-            this.$element.trigger('select::ready', this);
+            self.$ul.html(html);
         },
-        bindEvent: function() {
+        replaceDiacritics: function(s){
+             /*
+                    /[\340-\346]/g, // a
+                    /[\350-\353]/g, // e
+                    /[\354-\357]/g, // i
+                    /[\362-\370]/g, // o
+                    /[\371-\374]/g, // u
+                    /[\361]/g, // n
+                    /[\347]/g, // c
+                    /[\377]/g // y
+            */
+            var k, d = '40-46 50-53 54-57 62-70 71-74 61 47 77'.replace(/\d+/g, '\\3$&').split(' ');
+
+            for (k in d)
+                s = s.toLowerCase().replace(RegExp('[' + d[k] + ']', 'g'), 'aeiouncy'.charAt(k));
+
+            return s;
+        },
+        onLoad: function(){
+            var self = this;
+            var fn = self.options.load;
+            if (!fn) return;
+            self.load(function(callback) {
+                fn.apply(self, [callback]);
+            });
+        },
+        load: function(fn){
+            var self = this;
+            self.$wrapper.addClass(self.classes.loading);
+
+            self.loading++;
+            fn.apply(self, [function(results){
+                self.loading = Math.max(self.loading - 1, 0);
+                if(results && results.length){
+                    self.addToData(results);
+                    self.addToSelect(results);
+                    self.refreshOptions();
+                }
+                if (!self.loading) {
+                    self.$wrapper.removeClass('loading');
+                }
+
+                self.$select.trigger('select::load', self, results);
+            }]);
+        },
+
+        attachEvents: function() {
             var self = this;
 
-            if (this.options.trigger === 'click') {
-                this.$trigger.on('click.select', function() {
+            if (self.options.trigger === 'click') {
+                self.$trigger.on('click.select', function() {
                     self.position.call(self);
 
                     if (self.opened === true) {
-                        self.hide.call(self);
+                        self.close();
                     } else {
-                        self.show.call(self);
+                        self.open();
                     }
 
                     return false;
                 });
             } else {
-                this.$trigger.on('mouseenter.select', function() {
-                    self.position.call(self);
-                    self.show.call(self);
+                self.$trigger.on('mouseenter.select', function() {
+                    self.position();
+                    self.open();
                     return false;
                 });
 
                 // when mouse leave from $trigger or $dropdown both can trigger mouseleave event
                 // this event acquired by their parent element $select 
-                this.$select.on('mouseleave.select', function() {
-                    self.hide.call(self);
+                self.$wrapper.on('mouseleave.select', function() {
+                    self.close();
                     return false;
                 });
             }
 
-            this.$dropdown.on('li', 'mouseenter.select', function() {
-                self.$element.trigger('select::option::mouseenter', self);
-                return false;
-            }).on('li', 'mouseleave.select', function() {
-                self.$element.trigger('select::option::mouseleave', self);
-                return false;
-            }).on('li', 'click.select', function() {
-                var value = $(this).data('value');
-                if (value === undefined) {
-                    return false;
+            self.$select.on({
+                'focus': function(){
+                    self.$wrapper.addClass(self.classes.focus);
+                    self.inFocus = true;
+                },
+                'blur': function(){
+                    self.$wrapper.removeClass(self.classes.focus);
+                    self.inFocus = false;
+                }
+            });
+
+            self.$dropdown.on('click.select', '.'+self.classes.item , function(){
+                var index = $(this).index();
+                var value;
+                if($(this).parent().parent().is('.'+self.classes.group)){
+                    var parent_index = $(this).parent().parent().index();
+                    value = self.data[parent_index]['options'][index].value;
+                }else{
+                    value = self.data[index].value;
                 }
 
-                self.set.call(self, value);
+                self.select(value);
+                self.close();
                 return false;
             });
+
+            // this.$dropdown.on('li', 'mouseenter.select', function() {
+            //     self.$select.trigger('select::option::mouseenter', self);
+            //     return false;
+            // }).on('li', 'mouseleave.select', function() {
+            //     self.$select.trigger('select::option::mouseleave', self);
+            //     return false;
+            // });
             this.eventBinded = true;
         },
-        unbindEvent: function() {
+        dettachEvents: function() {
             this.$dropdown.off('.select');
             this.$trigger.off('.select');
-            this.$select.off('.select');
+            this.$wrapper.off('.select');
             this.eventBinded = false;
         },
         position: function() {
@@ -188,93 +314,109 @@
                 top: top,
             });
         },
-        set: function(value) {
+        select: function(value) {
             var self = this;
+            var selectedItem = null;
 
-            this.$li.removeClass(this.classes.selected);
-            this.value = value;
+            if(self.selected === value){
+                return;
+            }
 
-            $.each(this.$options, function(i, v) {
-                if ($(v).attr('value') === value) {
-                    $(v).prop('selected', true);
-                }
-            });
-
-            $.each(this.$li, function(i, v) {
-                if ($(v).data('value') === value) {
-                    $(v).addClass(self.classes.selected);
-                    self.$trigger.find('span').text($(v).find('a').text());
-
-                    if ($.isFunction(self.options.onChange)) {
-                        self.options.onChange.call(self,value);
+            $.each(this.data, function(i, item){
+                if(item.group){
+                    if($.isArray(item.options)){
+                        $.each(item.options, function(j, option){
+                            if(option.value === value){
+                                self.selectedIndex = [i, j];
+                                selectedItem = option;
+                            }
+                        });
                     }
-                    self.$select.trigger('change', value);
+                } else {
+                    if(item.value === value){
+                        self.selectedIndex = i;
+                        selectedItem = item;
+                    }
                 }
             });
 
-            this.hide();
-            this.$element.trigger('select::change', this);
+            self.$ul.find('li').removeClass(this.classes.selected);
+
+            if(selectedItem){ // if found
+                self.$label.html(self.options.render.label(selectedItem));
+                self.getLi(self.selectedIndex).addClass(this.classes.selected);
+
+                // trigger change event
+                if ($.isFunction(self.options.onChange)) {
+                    self.options.onChange.call(self, selectedItem);
+                }
+                self.$select.trigger('select::change', [this, selectedItem]);
+
+                self.selected = value;
+                self.$select.val(value);
+            } else {
+                self.selected = null;
+            }
         },
-        get: function() {
-            var self = this,
-                value;
-
-            $.each(this.$options, function(i, v) {
-                if ($(v).attr('value') === self.value) {
-                    value = $(v).text();
-                }
-            });
-
-            return value;
+        getLi: function(index){
+            if($.isArray(index)){
+                return this.$ul.children('li').eq(index[0]).find('li').eq(index[1]);
+            }else{
+                return this.$ul.children('li').eq(index);
+            }
         },
 
         /*
             Public Method
          */
-        
-        show: function() {
-            this.$dropdown.css({
-                display: 'block'
-            });
-            this.$trigger.addClass(this.classes.active);
-            this.$dropdown.addClass(this.classes.show);
-            $(document).on('click.select', $.proxy(this.hide, this));
-            this.opened = true;
-            this.$element.trigger('select::show', this);
-            return this;
+        open: function() {
+            var self = this;
+
+            self.$select.focus();
+
+            self.$wrapper.addClass(self.classes.open);
+
+            $(document).on('click.select', $.proxy(self.close, self));
+
+            self.opened = true;
+            self.$select.trigger('select::open', self);
+            return self;
         },
-        hide: function() {
-            this.$dropdown.css({
-                display: 'none'
-            });
-            this.$trigger.removeClass(this.classes.active);
-            this.$dropdown.removeClass(this.classes.show);
+        close: function() {
+            var self = this;
+            self.$wrapper.removeClass(self.classes.open);
+
             $(document).off('click.select');
-            this.opened = false;
-            this.$element.trigger('select::hide', this);
-            return this;
+
+            self.opened = false;
+            self.$select.trigger('select::close', self);
+            return self;
         },
         val: function(value) {
             if (value) {
-                this.set(value);
+                this.select(value);
                 return this;
             } else {
-                return this.get();
+                return this.$select.val();
             }
         },
         enable: function() {
-            this.disbaled = false;
-            this.$trigger.removeClass(this.classes.disbaled);
+            this.disabled = false;
+            this.$trigger.removeClass(this.classes.disabled);
             return this;
         },
         disable: function() {
-            this.disbaled = true;
-            this.$trigger.addClass(this.classes.disbaled);
+            this.disabled = true;
+            this.$trigger.addClass(this.classes.disabled);
             return this;
         },
         destroy: function() {
-            this.$trigger.off('.select');
-            this.$select.remove();
+            this.$dropdown.remove();
+            this.$trigger.remove();
+            this.$select.unwrap().unwrap().off('.select');
+
+            $(document).off('.select');
+            return this;
         }
     };
 
@@ -282,13 +424,25 @@
         namespace: 'select',
         skin: null,
         trigger: 'click', // 'hover' or 'click'
-        value: 'a',
         offset: [0, 0],
-        // status: {
-        //     a: 'beijing',
-        //     b: 'fujian',
-        //     c: 'zhejiang'
-        // },
+        json: null,
+        preload: false,
+        load: null,
+        render: {
+            label: function(selected){
+                if(selected){
+                    return selected.text;
+                }else{
+                    return 'Choose one';
+                }
+            },
+            option: function(item){
+                return item.text;
+            },
+            group: function(item){
+                return item.label;
+            }
+        },
         onChange: function() {}
     };
 
@@ -304,14 +458,11 @@
                 }
             });
         } else {
-            var opts = options || {};
-            opts.$group = this;
             return this.each(function() {
                 if (!$.data(this, 'select')) {
-                    $.data(this, 'select', new Select(this, opts));
+                    $.data(this, 'select', new Select(this, options));
                 }
             });
         }
     };
-
 }(jQuery));

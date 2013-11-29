@@ -116,7 +116,7 @@
     &lt;option value="b"&gt;fujian&lt;/option&gt;
     &lt;option value="c"&gt;zhejiang&lt;/option&gt;
     &lt;option value="d"&gt;tianjin&lt;/option&gt;
-    &lt;option value="e"&gt;shanghai&lt;/option&gt;
+    &lt;option value="e" selected="selected"&gt;shanghai&lt;/option&gt;
 &lt;/select&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
@@ -137,7 +137,7 @@
                     <option value="b">fujian</option>
                     <option value="c">zhejiang</option>
                     <option value="d">tianjin</option>
-                    <option value="e">shanghai</option>
+                    <option value="e" selected="selected">shanghai</option>
                 </select>
                 <script>                   
                     $(document).ready(function() {
@@ -235,6 +235,72 @@
         </section>  
 
         <section>
+            <h4>icon support</h4>
+            <pre class="has-example"><code class="language-javascript">
+&lt;select class="group-select"&gt;
+    &lt;optgroup label="north"&gt;
+        &lt;option value="a"&gt;beijing&lt;/option&gt;
+        &lt;option value="b"&gt;fujian&lt;/option&gt;
+    &lt;/optgroup&gt;
+    &lt;optgroup label="east"&gt;
+        &lt;option value="c"&gt;zhejiang&lt;/option&gt;
+        &lt;option value="d"&gt;tianjin&lt;/option&gt;
+        &lt;option value="e"&gt;shanghai&lt;/option&gt;
+    &lt;/optgroup&gt;
+    &lt;optgroup label="south"&gt;
+        &lt;option value="f"&gt;jiangsu&lt;/option&gt;
+    &lt;/optgroup&gt;                    
+&lt;/select&gt;
+&lt;script&gt;                   
+    $(document).ready(function() {
+
+        $('.icon-select').select({
+            render:{
+                option: function(item){
+                    return '<i class="icon-'+item.icon+'"></i>'+item.text;
+                },
+                group: function(item){
+                    return '<i class="icon-'+item.icon+'"></i>'+item.label;
+                }
+            }
+        });                      
+    });
+&lt;/script&gt;
+            </code></pre>
+            <div class="example">
+                <select class="icon-select">
+                    <optgroup label="north" data-icon="north">
+                        <option value="a" data-icon="beijing">beijing</option>
+                        <option value="b" data-icon="fujian">fujian</option>
+                    </optgroup>
+                    <optgroup label="east" data-icon="east">
+                        <option value="c" data-icon="zhejiang">zhejiang</option>
+                        <option value="d" data-icon="tianjin">tianjin</option>
+                        <option value="e" data-icon="shanghai">shanghai</option>
+                    </optgroup>
+                    <optgroup label="south" data-icon="south">
+                        <option value="f" data-icon="jiangsu">jiangsu</option>
+                    </optgroup>                    
+                </select>
+                <script>                   
+                    $(document).ready(function() {
+
+                        $('.icon-select').select({
+                            render:{
+                                option: function(item){
+                                    return '<i class="icon-'+item.icon+'"></i>'+item.text;
+                                },
+                                group: function(item){
+                                    return '<i class="icon-'+item.icon+'"></i>'+item.label;
+                                }
+                            }
+                        });
+                    });
+                </script>
+            </div>
+        </section>  
+
+        <section>
             <h4>hover trigger</h4>
             <pre class="has-example"><code class="language-javascript">
 &lt;select class="hover-select"&gt;
@@ -271,57 +337,154 @@
 
            
         </section>  
-
         <section>
-            <h4>build from blank div</h4>
+            <h4>build from json</h4>
             <pre class="has-example"><code class="language-javascript">
-&lt;div class="blank-select"&gt;&lt;/div&gt;
+&lt;div class="build-from-json"&gt;&lt;/div&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.blank-select').select({
-            status: {
-                a: {
-                    text: 'on',
-                    icon: 'icon-1'
-                },
-                b: {
-                    text: 'off',
-                    icon: 'icon-2'
-                },
-                c: {
-                    text: 'default',
-                    icon: 'icon-3'
-                }
+        $('.build-from-json').select({
+            load: function(callback){
+                callback([
+                    {"value":"value_1","text":"value 1"},
+                    {"value":"value_2","text":"value 2"}
+                ]);
             }
-        });                               
+        });
     });
 &lt;/script&gt;
             </code></pre>
             <div class="example">
-                <div class="blank-select"></div>
+                <select class="build-from-json"></select>
                 <script>                   
-                    $(document).ready(function() {
-                        $('.blank-select').select({
-                            status: {
-                                a: {
-                                    text: 'on',
-                                    icon: 'icon-1'
-                                },
-                                b: {
-                                    text: 'off',
-                                    icon: 'icon-2'
-                                },
-                                c: {
-                                    text: 'default',
-                                    icon: 'icon-3'
-                                }
-                            }
-                        });                        
+                    $('.build-from-json').select({
+                        preload: true,
+                        load: function(callback){
+                            callback([
+                                {"value":"value_1","text":"value 1"},
+                                {"value":"value_2","text":"value 2"}
+                            ]);
+                        }
                     });
                 </script>
             </div>
-
-           
+        </section>
+        <section>
+            <h4>build from json</h4>
+            <pre class="has-example"><code class="language-javascript">
+&lt;div class="build-with-group"&gt;&lt;/div&gt;
+&lt;script&gt;                   
+    $(document).ready(function() {
+        $('.build-with-group').select({
+            load: function(callback){
+                callback([
+                    {"label":"group","options":[
+                        {"value":"value_1","text":"value 1"}
+                        {"value":"value_2","text":"value 2"}
+                    ]},
+                    {"value":"value_3","text":"value 3"}
+                ]);
+            }
+        });
+    });
+&lt;/script&gt;
+            </code></pre>
+            <div class="example">
+                <select class="build-with-group"></select>
+                <script>
+                    $('.build-with-group').select({
+                        preload: true,
+                        load: function(callback){
+                            callback([
+                                {"group": true, "label":"group","options":[
+                                    {"value":"value_1","text":"value 1"},
+                                    {"value":"value_2","text":"value 2"}
+                                ]},
+                                {"value":"value_3","text":"value 3"}
+                            ]);
+                        }
+                    });
+                </script>
+            </div>
+        </section>
+        <section>
+            <h4>build use load function</h4>
+            <pre class="has-example"><code class="language-javascript">
+&lt;div class="build-use-load"&gt;&lt;/div&gt;
+&lt;script&gt;                   
+    $(document).ready(function() {
+        $('.build-use-load').select({
+            valueField: 'url',
+            labelField: 'name',
+            preload: true,
+            load: function(callback){
+                $.ajax({
+                    url: 'https://api.github.com/users/amazingSurge/repos',
+                    type: 'GET',
+                    error: function() {
+                        callback();
+                    },
+                    success: function(res) {
+                        var data = [];
+                        $.each(res.slice(0, 10), function(i, item){
+                            data.push({
+                                value: item.url,
+                                text: item.name,
+                                fork: item.fork,
+                                id: item.id
+                            });
+                        });
+                        callback(data);
+                    }
+                });
+            },
+            render: {
+                option: function(item){
+                    return '&lt;span class="name"&gt;&lt;i class="icon ' + (item.fork ? 'fork' : 'source') + '"&gt;&lt;/i&gt;' + item.text + '&lt;/span&gt;' +
+                            '&lt;span class="id"&gt;' + item.id + '&lt;/span&gt;';
+                }
+            }
+        });
+    });
+&lt;/script&gt;
+            </code></pre>
+            <div class="example">
+                <select class="build-use-load"></select>
+                <script>                   
+                    $('.build-use-load').select({
+                        valueField: 'url',
+                        labelField: 'name',
+                        preload: true,
+                        load: function(callback){
+                            $.ajax({
+                                url: 'https://api.github.com/users/amazingSurge/repos',
+                                type: 'GET',
+                                error: function() {
+                                    callback();
+                                },
+                                success: function(res) {
+                                    var data = [];
+                                    $.each(res.slice(0, 10), function(i, item){
+                                        data.push({
+                                            value: item.url,
+                                            text: item.name,
+                                            fork: item.fork,
+                                            id: item.id
+                                        });
+                                    });
+                                    callback(data);
+                                }
+                            });
+                        },
+                        render: {
+                            option: function(item){
+                                return '<span class="name"><i class="icon ' + (item.fork ? 'fork' : 'source') + '"></i>' + item.text + '</span>' +
+                                        '<span class="id">' + item.id + '</span>';
+                            }
+                        }
+                    });
+                </script>
+            </div>
         </section>  
         
 
