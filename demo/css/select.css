@@ -55,6 +55,7 @@
 	opacity: 0.5;
 }
 .select_open .select-dropdown {
+	width: 297px;
 	z-index: 9999; 
 }
 .select-trigger {

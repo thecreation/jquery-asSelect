@@ -1,7 +1,5 @@
 http://patrickkunka.github.io/easydropdown/
 
-
-
 http://lcdsantos.github.io/jQuery-Selectric/demo.html
 http://patrickkunka.github.io/easydropdown/
 http://www.bartos.me/heapbox/
