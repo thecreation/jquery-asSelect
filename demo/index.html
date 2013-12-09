@@ -123,9 +123,8 @@
         $('.custom-select').select({
             skin: 'simple',
             offset: [0,0],
-            onChange: function(instance) {
-                var value = instance.get();
-                $('&lt;div&gt;&lt;span&gt;value: &lt;/span&gt;' + value + '&lt;/div&gt;').prependTo($('.content1'));
+            onChange: function(data) {
+                $('&lt;div&gt;&lt;span&gt;value: &lt;/span&gt;' + data + '&lt;/div&gt;').prependTo($('.content1'));
             }
         });                        
     });
@@ -145,27 +144,28 @@
                             skin: 'simple',
                             offset: [0,0]
                         }); 
-                        $('.custom-select').on('select::trigger', function(event, instance) {
+                        $('.custom-select').on('select::trigger', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::change', function(event, instance) {
-                            var text = event.type + ': triggered;' + ' value: ' + instance.val();
+                        $('.custom-select').on('select::change', function(event, data) {
+                            console.log(data);
+                            var text = event.type + ': triggered;' + ' value: ' + data.value;
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::show', function(event, instance) {
+                        $('.custom-select').on('select::open', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::hide', function(event, instance) {
+                        $('.custom-select').on('select::close', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::option::mouseenter', function(event, instance) {
+                        $('.custom-select').on('select::option::mouseenter', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::option::mouseleave', function(event, instance) {
+                        $('.custom-select').on('select::option::mouseleave', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         });                        
@@ -201,7 +201,6 @@
 &lt;/select&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-
         $('.group-select').select({
             skin: 'simple',
         });                        
@@ -370,6 +369,223 @@
             </div>
         </section>
         <section>
+            <h4>add Data after build</h4>
+            <pre class="has-example"><code class="language-javascript">
+&lt;div class="select-scroll"&gt;&lt;/div&gt;
+&lt;button class="load-button"&gt;click to load data&lt;/button&gt;
+&lt;button class="reset-button"&gt;reset&lt;/button&gt;
+&lt;script&gt;                   
+    $(document).ready(function() {
+        $('.select-scroll').select({
+            load: function(callback){
+                callback([
+                    {"value":"value_1","text":"a-value1"},
+                    {"value":"value_2","text":"a-value2"},
+                    {"value":"value_3","text":"a-value3"},
+                ]);
+            }
+        });
+        $('.load-button').on('click',function() {
+            var instance = $('.select-load').data('select');
+            instance.addData([
+                {"value":"value_4","text":"a-value4"},
+                {"value":"value_5","text":"a-value5"},
+                {"value":"value_6","text":"a-value6"},
+                {"value":"value_7","text":"a-value7"},
+                {"value":"value_8","text":"b-value 8"},
+                {"value":"value_9","text":"b-value 9"},
+                {"value":"value_10","text":"b-value 10"},
+                {"value":"value_11","text":"b-value 11"},
+                {"value":"value_12","text":"b-value 12"},
+                {"value":"value_13","text":"b-value 13"},
+                {"value":"value_14","text":"c-value 14"},
+                {"value":"value_15","text":"c-value 15"},
+                {"value":"value_16","text":"c-value 16"},
+                {"value":"value_17","text":"c-value 17"},
+                {"value":"value_18","text":"d-value 18"},
+                {"value":"value_19","text":"d-value 19"},
+                {"value":"value_20","text":"d-value 20"},
+                {"value":"value_21","text":"d-value 21"},
+                {"value":"value_22","text":"d-value 22"},
+                {"value":"value_23","text":"f-value 23"},
+                {"value":"value_24","text":"f-value 24"},
+                {"value":"value_25","text":"f-value 25"},
+                {"value":"value_26","text":"f-value 26"},
+                {"value":"value_27","text":"f-value 27"},
+                {"value":"value_28","text":"value 28"},
+                {"value":"value_29","text":"value 29"},
+                {"value":"value_30","text":"value 30"},
+                {"value":"value_31","text":"value 31"}
+            ]);
+        });
+        $('.reset-button').on('click', function() {
+            var instance = $('.select-load').data('select');
+            instance.data = [
+                {"value":"value_1","text":"a-value1"},
+                {"value":"value_2","text":"a-value2"},
+                {"value":"value_3","text":"a-value3"}
+            ];
+            instance.update();
+        });
+    });
+&lt;/script&gt;
+            </code></pre>
+            <div class="example">
+                <select class="select-load"></select>
+                <button class="load-button">click to load data</button>
+                <button class="reset-button">reset</button>
+                <script>                   
+                    $('.select-load').select({
+                        preload: true,
+                        load: function(callback){
+                            callback([
+                                {"value":"value_1","text":"a-value1"},
+                                {"value":"value_2","text":"a-value2"},
+                                {"value":"value_3","text":"a-value3"}
+                            ]);
+                        }
+                    });
+                    $('.load-button').on('click',function() {
+                        var instance = $('.select-load').data('select');
+                        instance.addData([
+                            {"value":"value_4","text":"a-value4"},
+                            {"value":"value_5","text":"a-value5"},
+                            {"value":"value_6","text":"a-value6"},
+                            {"value":"value_7","text":"a-value7"},
+                            {"value":"value_8","text":"b-value 8"},
+                            {"value":"value_9","text":"b-value 9"},
+                            {"value":"value_10","text":"b-value 10"},
+                            {"value":"value_11","text":"b-value 11"},
+                            {"value":"value_12","text":"b-value 12"},
+                            {"value":"value_13","text":"b-value 13"},
+                            {"value":"value_14","text":"c-value 14"},
+                            {"value":"value_15","text":"c-value 15"},
+                            {"value":"value_16","text":"c-value 16"},
+                            {"value":"value_17","text":"c-value 17"},
+                            {"value":"value_18","text":"d-value 18"},
+                            {"value":"value_19","text":"d-value 19"},
+                            {"value":"value_20","text":"d-value 20"},
+                            {"value":"value_21","text":"d-value 21"},
+                            {"value":"value_22","text":"d-value 22"},
+                            {"value":"value_23","text":"f-value 23"},
+                            {"value":"value_24","text":"f-value 24"},
+                            {"value":"value_25","text":"f-value 25"},
+                            {"value":"value_26","text":"f-value 26"},
+                            {"value":"value_27","text":"f-value 27"},
+                            {"value":"value_28","text":"value 28"},
+                            {"value":"value_29","text":"value 29"},
+                            {"value":"value_30","text":"value 30"},
+                            {"value":"value_31","text":"value 31"}
+                        ]);
+                    });
+                    $('.reset-button').on('click', function() {
+                        var instance = $('.select-load').data('select');
+                        instance.data = [
+                            {"value":"value_1","text":"a-value1"},
+                            {"value":"value_2","text":"a-value2"},
+                            {"value":"value_3","text":"a-value3"}
+                        ];
+                        instance.update();
+                    });
+                </script>
+            </div>
+        </section>
+
+        <section>
+            <h4>with scroll</h4>
+            <pre class="has-example"><code class="language-javascript">
+&lt;div class="select-scroll"&gt;&lt;/div&gt;
+&lt;script&gt;                   
+    $(document).ready(function() {
+        $('.select-scroll').select({
+            load: function(callback){
+                callback([
+                    {"value":"value_1","text":"a-value1"},
+                    {"value":"value_2","text":"a-value2"},
+                    {"value":"value_3","text":"a-value3"},
+                    {"value":"value_4","text":"a-value4"},
+                    {"value":"value_5","text":"a-value5"},
+                    {"value":"value_6","text":"a-value6"},
+                    {"value":"value_7","text":"a-value7"},
+                    {"value":"value_8","text":"b-value 8"},
+                    {"value":"value_9","text":"b-value 9"},
+                    {"value":"value_10","text":"b-value 10"},
+                    {"value":"value_11","text":"b-value 11"},
+                    {"value":"value_12","text":"b-value 12"},
+                    {"value":"value_13","text":"b-value 13"},
+                    {"value":"value_14","text":"c-value 14"},
+                    {"value":"value_15","text":"c-value 15"},
+                    {"value":"value_16","text":"c-value 16"},
+                    {"value":"value_17","text":"c-value 17"},
+                    {"value":"value_18","text":"d-value 18"},
+                    {"value":"value_19","text":"d-value 19"},
+                    {"value":"value_20","text":"d-value 20"},
+                    {"value":"value_21","text":"d-value 21"},
+                    {"value":"value_22","text":"d-value 22"},
+                    {"value":"value_23","text":"f-value 23"},
+                    {"value":"value_24","text":"f-value 24"},
+                    {"value":"value_25","text":"f-value 25"},
+                    {"value":"value_26","text":"f-value 26"},
+                    {"value":"value_27","text":"f-value 27"},
+                    {"value":"value_28","text":"value 28"},
+                    {"value":"value_29","text":"value 29"},
+                    {"value":"value_30","text":"value 30"},
+                    {"value":"value_31","text":"value 31"}
+                ]);
+            }
+        });
+    });
+&lt;/script&gt;
+            </code></pre>
+            <div class="example">
+                <select class="select-scroll"></select>
+                <script>                   
+                    $('.select-scroll').select({
+                        preload: true,
+                        load: function(callback){
+                            callback([
+                                {"value":"value_1","text":"a-value1"},
+                                {"value":"value_2","text":"a-value2"},
+                                {"value":"value_3","text":"a-value3"},
+                                {"value":"value_4","text":"a-value4"},
+                                {"value":"value_5","text":"a-value5"},
+                                {"value":"value_6","text":"a-value6"},
+                                {"value":"value_7","text":"a-value7"},
+                                {"value":"value_8","text":"b-value 8"},
+                                {"value":"value_9","text":"b-value 9"},
+                                {"value":"value_10","text":"b-value 10"},
+                                {"value":"value_11","text":"b-value 11"},
+                                {"value":"value_12","text":"b-value 12"},
+                                {"value":"value_13","text":"b-value 13"},
+                                {"value":"value_14","text":"c-value 14"},
+                                {"value":"value_15","text":"c-value 15"},
+                                {"value":"value_16","text":"c-value 16"},
+                                {"value":"value_17","text":"c-value 17"},
+                                {"value":"value_18","text":"d-value 18"},
+                                {"value":"value_19","text":"d-value 19"},
+                                {"value":"value_20","text":"d-value 20"},
+                                {"value":"value_21","text":"d-value 21"},
+                                {"value":"value_22","text":"d-value 22"},
+                                {"value":"value_23","text":"f-value 23"},
+                                {"value":"value_24","text":"f-value 24"},
+                                {"value":"value_25","text":"f-value 25"},
+                                {"value":"value_26","text":"f-value 26"},
+                                {"value":"value_27","text":"f-value 27"},
+                                {"value":"value_28","text":"value 28"},
+                                {"value":"value_29","text":"value 29"},
+                                {"value":"value_30","text":"value 30"},
+                                {"value":"value_31","text":"value 31"}
+                            ]);
+                        }
+                    });
+                </script>
+            </div>
+        </section>
+
+
+
+
+        <section>
             <h4>build from json</h4>
             <pre class="has-example"><code class="language-javascript">
 &lt;div class="build-with-group"&gt;&lt;/div&gt;
@@ -484,15 +700,13 @@
                         }
                     });
                 </script>
+
             </div>
         </section>  
         
 
     </section>
     
-      
-        
-        
     
 </div>
 

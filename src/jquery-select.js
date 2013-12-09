@@ -13,7 +13,7 @@
 
         // options
 		var meta_data = [];
-		$.each(this.$element.data(), function(k, v) {
+		$.each(this.$select.data(), function(k, v) {
 			var re = new RegExp("^select", "i");
 			if (re.test(k)) {
 				meta_data[k.toLowerCase().replace(re, '')] = v;
@@ -32,6 +32,7 @@
             handler: this.namespace + '-handler',
             item: this.namespace +'-item',
             group: this.namespace +'-group',
+            mask: this.namespace + '-mask',
 
             skin: this.namespace + '_' + this.options.skin,
             open: this.namespace + '_open',
@@ -42,16 +43,13 @@
             error: this.namespace + '_error'
         };
 
-        if (this.options.skin) {
- 			this.$select.addClass(this.classes.skin);
-        }
-
         // flag
         this.opened = false;
         this.eventBinded = false;
         this.inFocus = true;
-        this.loading = 0;
+        //this.loading = false;
         this.currentIndex = 0;
+        this.isScroll = false;
         this.last = 0;
 
         this.$select.trigger('select::init', this);
@@ -69,6 +67,13 @@
             this.$dropdown = $('<div class="' + this.classes.dropdown + '"><ul></ul></div>');
             this.$ul = this.$dropdown.children('ul');
 
+			if (this.options.skin) {
+				this.$wrapper.addClass(this.classes.skin);
+			}
+
+            this.unChooseText = this.$label.text();
+            this.$dropdown.css('maxHeight',this.options.maxHeight);
+
             // parse data from select label
             this.data = this.parse(this.$select.children());
 
@@ -79,30 +84,59 @@
             this.$wrapper.append(this.$trigger).append(this.$dropdown);
 
             // attach event
-            this.attachEvent();
+            this.attachInitEvent();
 
             // set initial value
             this.select(this.currentIndex);
+
+            if (self.options.preload) {
+                self.onLoad();
+            }
 
 			// hold every instance
 			this.instances.push(this);
 			this.$select.trigger('select::ready',this);
 		},
-		load: function(promise) {
-			var self = this;
-			this.$wrap.addClass(this.classes.loading);
-			promise.then(function(results) {
-				var data;
-				self.$wrap.removeClass(this.classes.loading);
-				data = self.options.onload(results);
-				self.data = data;
-				self.update();
-			}, function() {
-				self.$wrap.removeClass(this.classes.loading);
-				self.$wrap.addClass(this.classes.error);
-				self.data = null;
-			});
-		},
+        onLoad: function(){
+            var self = this;
+            var fn = self.options.load;
+            if (!fn) return;
+            self.load(function(callback) {
+                fn.apply(self, [callback]);
+            });
+        },
+		// load: function(promise) {
+		// 	var self = this;
+		// 	this.$wrapper.addClass(this.classes.loading);
+		// 	promise.then(function(results) {
+		// 		var data;
+		// 		self.$wrapper.removeClass(this.classes.loading);
+		// 		data = self.options.onload(results);
+		// 		self.data = data;
+		// 		self.update();
+		// 	}, function() {
+		// 		self.$wrapper.removeClass(this.classes.loading);
+		// 		self.$wrapper.addClass(this.classes.error);
+		// 		self.data = null;
+		// 	});
+		// },
+        load: function(fn){
+            var self = this;
+            self.$wrapper.addClass(self.classes.loading);
+
+            self.loading++;
+            fn.apply(self, [function(results){
+                self.loading = Math.max(self.loading - 1, 0);
+                if(results && results.length){
+                    self.addData(results);
+                }
+                if (!self.loading) {
+                    self.$wrapper.removeClass('loading');
+                }
+
+                self.$select.trigger('select::load', self, results);
+            }]);
+        }, 
 		render: function(data) {
 			var html = '', self = this;
             var buildOption = function(item){
@@ -168,28 +202,71 @@
 			this.total = this.$items.length;
 			this.last = 0;
 			this.currentIndex = this.$items.index('.'+this.classes.selected);
-			
-			this.$wrap.removeClass(this.classes.error);
+
+            this.$wrapper.removeClass(this.classes.error);
+
+            if (this.$dropdown.height() > this.$ul.outerHeight()) {
+                this.isScroll = true;
+            } else {
+                this.isScroll = false;
+            }
+
+            if (this.currentIndex >= 0) {
+                this._set(this.currentIndex);
+            } else {
+                this.$label.text(this.unChooseText);
+            }		
 		},
 		select: function(index) {
-			var $item = this.$items[index];
-			if (!index) {
+			if (index < 0 || index === undefined) {
 				return;
 			}
-			this._select($item);
+            this._select(index);
+            this._set(index);
 		},
-		_select: function($item) {
+		_select: function(index) {
+            var item = this.$items[index],
+                $item = $(item);
+
+            this.isScroll && this.scrollToVisibility(index);
+
 			this.$items.removeClass(this.classes.selected);
 			$item.addClass(this.classes.selected);
-
-			this.last = this.currentIndex;
-			this.currentIndex = this.$items.index($item);
-			this.$label.text($item.text());
-
-			if (this.last !== this.currentIndex) {
-				this.$select.trigger('select::change',this);
-			}
 		},
+        _set: function(index) {
+            var item = this.$items[index],
+                $item = $(item);
+            this.last = this.currentIndex;
+            this.currentIndex = index;
+            this.$label.text($item.text());
+
+            if (this.last !== this.currentIndex) {
+                // pass source data object 
+                this.$select.trigger('select::change',this.getCurrentData(index));
+            }
+        },
+        getCurrentData: function(index) {
+            var count = 0, result = null;
+            $.each(this.data, function(i, item){
+                if(item.group){
+                    if($.isArray(item.options)){
+                        $.each(item.options, function(j, option){
+                            count ++;
+                            if (index+1===count) {
+                                result = option;
+                            }
+                        });
+                    }
+                } else {
+                    count ++;
+                    if (index+1===count) {
+                        result = item;
+                    }
+                }
+            });
+
+            return result;
+        },
 		replaceDiacritics: function(s) {
 			// /[\340-\346]/g, // a
             // /[\350-\353]/g, // e
@@ -231,7 +308,7 @@
                     return false;
                 });
 			} else {
-				this.$trigger('click.select', function() {
+				this.$trigger.on('click.select', function() {
 					if (self.opened) {
 						self.close();
 					} else {
@@ -249,7 +326,7 @@
 			});
 			
 			this.$dropdown.on('click.select', '.'+this.classes.item, function() {
-				var index = self.$items.index($(this));
+                var index = self.$items.index($(this));
 				self.select(index);
 				self.close();
 			});
@@ -258,24 +335,27 @@
 			var self = this;
 			$(document).on('keydown.select', function(e) {
 				var key = e.which || e.keycode;
+
+                if (/^(9|13|27)$/.test(key)) {
+                    // close shortcut
+                    self.close();
+                    return false;
+                }
 				
 				if (key < 37 || key > 40) {
 					// search
-					self.search.call(self,key);
-				} else if (/^(39|40)$/.test(key)) {
+					self.isScroll && self.search.call(self,key);
+				} else if (/^(38|40)$/.test(key)) {
 					// key navigate
-					var direction = key === 39 ? 'up':'down';
+					var direction = key === 38 ? 'up':'down';
 					self.navigate(direction);
+                    return false;
 				}
-
-				if (/^(9|13|27)$/.test(key)) {
-					// close shortcut
-					self.close();
-				}
+				
 			});
 		},
 		search: function(key) {
-            var searchString,currentIndex;
+            var searchString = '',currentIndex;
             clearTimeout(this.timeout);
             searchString = RegExp('^' + (searchString += String.fromCharCode(key)), 'i');
             this.timeout = setTimeout(function() {
@@ -289,36 +369,61 @@
                     return false;
                 }
             });
-            this.scrollToVisibility(currentIndex);
+            if (currentIndex >= 0) {
+                this.select(currentIndex);
+            }
         },
         scrollToVisibility: function(index) {
-            var $item = this.$items[index],
-            	bottom = this.$ul.outerHeight() - this.$dropdown.height(),
-                distance = $item.position().top;
+            var item = this.$items[index],scrollTop,
+                itemHeight = $(item).outerHeight(),
+                oriScrollTop = this.$dropdown.scrollTop(),
+                bottom = oriScrollTop + this.$dropdown.height(),
+                distance = $(item).position().top;
 
-            if (distance < 0){
-                distance = 0;
-            } else if (distance > bottom) {
-                distance = bottom;
+            if (distance < oriScrollTop){
+                scrollTop = distance;
+            } else if (distance > bottom - itemHeight) {
+                scrollTop = distance + itemHeight - this.$dropdown.height();
+            } else {
+                return;
             }
-            this.$dropdown.scrollTop(distance);
+            this.$dropdown.scrollTop(scrollTop);
         },
         navigate: function(direction) {
-            var index = this.currentIndex,total = this.total;
+            var total = this.total,
+                index = this.currentIndex < 0 ? 0 : this.currentIndex ;
             if (direction === 'up') {
-                index = index > total ? total: index;
+                index = index <= 0 ? total-1 : index - 1;
             } else {
-                index = index < 0 ? 0 : index;
+                index = index >= total-1 ? 0: index + 1;
+                
             } 
             this.select(index);
+        },
+        _generateMask: function() {
+            var self = this;
+            if (this.options.trigger === 'hover') { return; }
+            this.$mask = $('<div class="' + this.classes.mask +'"></div>').appendTo(this.$wrapper);
+            this.$mask.on('click.select', function() {
+                self.close();
+                return false;
+            });
+        },
+        _clearMask: function() {
+            if (this.options.trigger === 'hover') { return; }
+            this.$mask.off('click.select');
+            this.$mask.remove();
+            this.$mask = null;
         },
 		open: function() {
 			if (this.opened) { 
 				return;
 			}
-			this.$select.focus();
-            this.$wrapper.addClass(this.classes.open);
 
+			this.$select.focus();
+            this.closeAll();
+            this.$wrapper.addClass(this.classes.open);
+            this._generateMask();
 			this.keyboardEvent();
 			this.position();
 
@@ -327,6 +432,7 @@
 		},
 		close: function() {
 			this.$wrapper.removeClass(this.classes.open);
+            this._clearMask();
 			$(document).off('keydown.select');
 			this.$select.trigger('select::close', this);
 			this.opened = false;
@@ -339,7 +445,16 @@
 			});
 		},
 		addData: function(data) {
-			return data;
+			var self = this;
+            if($.isArray(data)){
+                $.each(data, function(i, item){
+                    if(!item.group){
+                        data[i].slug = self.replaceDiacritics(item.text);
+                    }
+                });
+                this.data = this.data.concat(data);
+                this.update();
+            }
 		},
 		removeData: function(data) {
 			return data;
@@ -352,6 +467,7 @@
         offset: [0, 0],
         json: null,
         preload: false,
+        maxHeight: 350,
         load: null,
         render: {
             label: function(selected){
