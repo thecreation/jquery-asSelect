@@ -51,6 +51,7 @@
         this.currentIndex = 0;
         this.isScroll = false;
         this.last = 0;
+        this.disabled = false;
 
         this.$select.trigger('select::init', this);
         this.init();
@@ -59,17 +60,21 @@
 		constructor: Select,
 		instances: [],
 		init: function(){
-			var self = this;
 
 			this.$wrapper = this.$select.wrap('<div class="'+this.classes.wrapper+'"><div class="'+this.classes.old+'" ></div></div>').parent().parent();
             this.$trigger = $('<div class="' + this.classes.trigger + '"><div class="'+ this.classes.handler +'"></div></div>');
             this.$label = $('<div class="'+this.classes.label +'">'+this.options.render.label()+'</div>').prependTo(this.$trigger);
             this.$dropdown = $('<div class="' + this.classes.dropdown + '"><ul></ul></div>');
             this.$ul = this.$dropdown.children('ul');
+            this.$options = this.$select.find('option');
 
 			if (this.options.skin) {
 				this.$wrapper.addClass(this.classes.skin);
 			}
+
+            if (this.$select.prop('disabled')) {
+                this.disable();
+            }
 
             this.unChooseText = this.$label.text();
             this.$dropdown.css('maxHeight',this.options.maxHeight);
@@ -78,7 +83,7 @@
             this.data = this.parse(this.$select.children());
 
             // render html from data
-            this.update();
+            this.update(true);
 
             // add to page
             this.$wrapper.append(this.$trigger).append(this.$dropdown);
@@ -89,8 +94,8 @@
             // set initial value
             this.select(this.currentIndex);
 
-            if (self.options.preload) {
-                self.onLoad();
+            if (this.options.preload) {
+                this.onLoad();
             }
 
 			// hold every instance
@@ -105,21 +110,6 @@
                 fn.apply(self, [callback]);
             });
         },
-		// load: function(promise) {
-		// 	var self = this;
-		// 	this.$wrapper.addClass(this.classes.loading);
-		// 	promise.then(function(results) {
-		// 		var data;
-		// 		self.$wrapper.removeClass(this.classes.loading);
-		// 		data = self.options.onload(results);
-		// 		self.data = data;
-		// 		self.update();
-		// 	}, function() {
-		// 		self.$wrapper.removeClass(this.classes.loading);
-		// 		self.$wrapper.addClass(this.classes.error);
-		// 		self.data = null;
-		// 	});
-		// },
         load: function(fn){
             var self = this;
             self.$wrapper.addClass(self.classes.loading);
@@ -165,6 +155,32 @@
             });
             self.$ul.html(html);
 		},
+        freshOptions: function(data) {
+            var self = this, html = '';
+            var buildOption = function(item){
+                if(item.value === self.selected){
+                    return '<option value="'+item.value+'" selected="selected">'+ item.text + '</option>';
+                } else {
+                    return '<option value="'+item.value+'">' + item.text + '</option>';
+                }
+            };
+            if($.isArray(data)){
+                $.each(data, function(i, item){
+                    if(item.group){
+                        html += '<optgroup label="'+item.label+'">';
+                            if($.isArray(item.options)){
+                                $.each(item.options, function(j, option){
+                                    html += buildOption(option);
+                                });
+                            }
+                        html += '</optgroup>';
+                    } else {
+                        html += buildOption(item);
+                    }
+                });
+            }
+            self.$select.html(html);
+        },
 		parse: function($selects) {
 			var self = this;
             var data = [];
@@ -195,10 +211,12 @@
             });
             return data;
 		},
-		update: function() {
+		update: function(noFreshOptions) {
 			this.render(this.data);
+            noFreshOptions && this.freshOptions(this.data);
 
 			this.$items = this.$dropdown.find('.' + this.classes.item);
+            this.$options = this.$select.find('option');
 			this.total = this.$items.length;
 			this.last = 0;
 			this.currentIndex = this.$items.index('.'+this.classes.selected);
@@ -239,6 +257,8 @@
             this.last = this.currentIndex;
             this.currentIndex = index;
             this.$label.text($item.text());
+
+            this.$options.length && $(this.$options[index]).prop('selected',true);
 
             if (this.last !== this.currentIndex) {
                 // pass source data object 
@@ -331,6 +351,12 @@
 				self.close();
 			});
 		},
+        dettachInitEvents: function() {
+            this.$trigger.off('.select');
+            this.$wrap.off('.select');
+            this.$select.off('.select');
+            this.$dropdown.off('.select');
+        },
 		keyboardEvent: function() {
 			var self = this;
 			$(document).on('keydown.select', function(e) {
@@ -416,7 +442,7 @@
             this.$mask = null;
         },
 		open: function() {
-			if (this.opened) { 
+			if (this.opened || this.disabled) { 
 				return;
 			}
 
@@ -458,7 +484,25 @@
 		},
 		removeData: function(data) {
 			return data;
-		}
+		},
+        enable: function() {
+            this.disabled = false;
+            this.$trigger.removeClass(this.classes.disabled);
+            return this;
+        },
+        disable: function() {
+            this.disabled = true;
+            this.$trigger.addClass(this.classes.disabled);
+            return this;
+        },
+        destroy: function() {
+            this.dettachInitEvents();
+            $(document).off('.select');
+
+            this.$dropdown.remove();
+            this.$trigger.remove();
+            this.$select.unwrap().unwrap();
+        }
 	};
 	Select.defaults = {
         namespace: 'select',

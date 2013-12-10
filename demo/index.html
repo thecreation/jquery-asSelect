@@ -234,6 +234,78 @@
         </section>  
 
         <section>
+            <h4>disbale / enable</h4>
+            <p>diable can be configed in orignal select element,it alse can be called from disable method, the function adds a select-disable classname to wrapper element, and set the this.disabled flag to true, which stops plugin to open dropdown panel</p>
+            <pre class="has-example"><code class="language-javascript">
+&lt;select class="select-disable"&gt;
+    &lt;optgroup label="north"&gt;
+        &lt;option value="a"&gt;beijing&lt;/option&gt;
+        &lt;option value="b"&gt;fujian&lt;/option&gt;
+    &lt;/optgroup&gt;
+    &lt;optgroup label="east"&gt;
+        &lt;option value="c"&gt;zhejiang&lt;/option&gt;
+        &lt;option value="d"&gt;tianjin&lt;/option&gt;
+        &lt;option value="e"&gt;shanghai&lt;/option&gt;
+    &lt;/optgroup&gt;
+    &lt;optgroup label="south"&gt;
+        &lt;option value="f"&gt;jiangsu&lt;/option&gt;
+    &lt;/optgroup&gt;                    
+&lt;/select&gt;
+&lt;script&gt;   
+&lt;button class="select-enable"&gt;click to enable&lt;/button&gt;   
+&lt;button class="select-disabled"&gt;click to disable&lt;/button&gt;               
+    $(document).ready(function() {
+        $('.select-disable').select({
+            skin: 'simple',
+        }); 
+        
+        $('.select-enable').on('click', function() {
+            // enable
+            $('.select-disable').select('enable'); 
+        });
+        $('.select-disabled').on('click', function() {
+            // here call disable method
+            $('.select-disable').select('disable'); 
+        });  
+    });
+&lt;/script&gt;
+            </code></pre>
+            <div class="example">
+                <select class="select-disable">
+                    <optgroup label="north">
+                        <option value="a">beijing</option>
+                        <option value="b">fujian</option>
+                    </optgroup>
+                    <optgroup label="east">
+                        <option value="c">zhejiang</option>
+                        <option value="d">tianjin</option>
+                        <option value="e">shanghai</option>
+                    </optgroup>
+                    <optgroup label="south">
+                        <option value="f">jiangsu</option>
+                    </optgroup>                    
+                </select>
+                <button class="select-enable">click to enable</button>
+                <button class="select-disabled">click to disable</button>
+                <script>                   
+                    $(document).ready(function() {
+
+                        $('.select-disable').select({
+                            skin: 'simple'
+                        });  
+                        
+                        $('.select-enable').on('click', function() {
+                            $('.select-disable').select('enable'); 
+                        });
+                        $('.select-disabled').on('click', function() {
+                            $('.select-disable').select('disable'); 
+                        });                     
+                    });
+                </script>
+            </div>
+        </section>  
+
+        <section>
             <h4>icon support</h4>
             <pre class="has-example"><code class="language-javascript">
 &lt;select class="group-select"&gt;
@@ -492,7 +564,7 @@
         </section>
 
         <section>
-            <h4>with scroll</h4>
+            <h4>with scroll / search / keyboard navigate / keep Native select API available</h4>
             <pre class="has-example"><code class="language-javascript">
 &lt;div class="select-scroll"&gt;&lt;/div&gt;
 &lt;script&gt;                   
