@@ -48,7 +48,7 @@
         this.eventBinded = false;
         this.inFocus = true;
         // this.loading = false;
-        this.currentIndex = this.options.selected || 0;
+        this.currentIndex = this.options.selected;
         this.isScroll = false;
         this.last = 0;
         this.disabled = false;
@@ -176,13 +176,6 @@
             var buildOption = function(item) {
                 return '<option value="' + item.value + '">' + item.text + '</option>';
             };
-            // var buildOption = function(item) {
-            //     if (item.value === self.selected) {
-            //         return '<option value="' + item.value + '" selected="selected">' + item.text + '</option>';
-            //     } else {
-            //         return '<option value="' + item.value + '">' + item.text + '</option>';
-            //     }
-            // };
             if ($.isArray(data)) {
                 $.each(data, function(i, item) {
                     if (item.group) {
@@ -228,6 +221,11 @@
                     data.push(optionToData.call(this));
                 }
             });
+            this.$options.each(function(key, option) {
+                if ($(option).prop('selected')) {
+                    self.currentIndex = key;
+                }
+            });
             return data;
         },
         update: function(noFreshOptions) {
@@ -261,14 +259,8 @@
             if (index < 0 || index === undefined) {
                 return;
             }
-            this._select(index);
-            this._set(index);
-        },
-        _select: function(index) {
-            var item = this.$items[index],
-                $item = $(item);
-
             this.isScroll && this.scrollToVisibility(index);
+            this._set(index);
         },
         _set: function(index) {
             var item = this.$items[index],
