@@ -48,7 +48,7 @@
         this.eventBinded = false;
         this.inFocus = true;
         // this.loading = false;
-        this.currentIndex = this.options.selected;
+        this.currentIndex = this.options.select;
         this.isScroll = false;
         this.last = 0;
         this.disabled = false;
@@ -256,11 +256,10 @@
             }
         },
         select: function(index) {
-            if (index < 0 || index === undefined) {
-                return;
+            if (typeof index === 'number' && index >= 0) {
+                this.isScroll && this.scrollToVisibility(index);
+                this._set(index);
             }
-            this.isScroll && this.scrollToVisibility(index);
-            this._set(index);
         },
         _set: function(index) {
             var item = this.$items[index],
@@ -528,11 +527,13 @@
         namespace: 'select',
         skin: null,
         trigger: 'click', // 'hover' or 'click'
-        offset: [0, 0],
-        json: null,
-        preload: false,
-        maxHeight: 350,
-        load: null,
+        offset: [0, 0], // set panel offset to trigger element
+        json: null, // if is a object,it will build from the object
+        preload: false, // preload some data set in load option
+        load: null, // preload data set here
+        maxHeight: 350, // set panel maxHeight, lists' height is bigger than maxHeight, scroll bar will show
+        select: undefined, // set initial selest value
+
         render: {
             label: function(selected) {
                 if (selected) {
