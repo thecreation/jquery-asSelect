@@ -1,36 +1,34 @@
 {
-  "name": "jquery-select",
-  "title": "jquery select",
-  "description": "a custom style select plugin",
-  "version": "0.1.1",
-  "homepage": "https://github.com/amazingSurge/jquery-select",
-  "author": {
-    "name": "amazingSurge",
-    "email": "amazingSurge@gmail.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/amazingSurge/jquery-select.git"
-  },
-  "bugs": "https://github.com/amazingSurge/jquery-select/issues",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/amazingSurge/jquery-select/blob/master/LICENSE-MIT"
+    "name": "jquery-asSelect",
+    "title": "jquery asSelect",
+    "description": "a custom style asSelect plugin",
+    "version": "0.1.1",
+    "homepage": "https://github.com/amazingSurge/jquery-asSelect",
+    "author": {
+        "name": "amazingSurge",
+        "email": "amazingSurge@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/amazingSurge/jquery-asSelect.git"
+    },
+    "bugs": "https://github.com/amazingSurge/jquery-asSelect/issues",
+    "licenses": [{
+        "type": "MIT",
+        "url": "https://github.com/amazingSurge/jquery-asSelect/blob/master/LICENSE-MIT"
+    }],
+    "devDependencies": {
+        "grunt-contrib-jshint": "~0.1.1",
+        "grunt-contrib-qunit": "~0.1.1",
+        "grunt-contrib-concat": "~0.1.2",
+        "grunt-contrib-uglify": "~0.1.1",
+        "grunt-contrib-watch": "~0.2.0",
+        "grunt-contrib-clean": "~0.4.0",
+        "grunt": "~0.4.0",
+        "grunt-jsbeautifier": "~0.1.5",
+        "grunt-recess": "~0.3.1"
+    },
+    "dependencies": {
+        "grunt-text-replace": "~0.3.6"
     }
-  ],
-  "devDependencies": {
-    "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-qunit": "~0.1.1",
-    "grunt-contrib-concat": "~0.1.2",
-    "grunt-contrib-uglify": "~0.1.1",
-    "grunt-contrib-watch": "~0.2.0",
-    "grunt-contrib-clean": "~0.4.0",
-    "grunt": "~0.4.0",
-    "grunt-jsbeautifier": "~0.1.5",
-    "grunt-recess": "~0.3.1"
-  },
-  "dependencies": {
-    "grunt-text-replace": "~0.3.6"
-  }
 }

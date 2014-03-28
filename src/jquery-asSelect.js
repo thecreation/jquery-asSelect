@@ -7,20 +7,20 @@
  */
 
 (function($) {
-    var Select = $.select = function(element, options) {
+    var AsSelect = $.asSelect = function(element, options) {
         this.element = element;
         this.$select = $(element);
 
         // options
         var meta_data = [];
         $.each(this.$select.data(), function(k, v) {
-            var re = new RegExp("^select", "i");
+            var re = new RegExp("^asSelect", "i");
             if (re.test(k)) {
                 meta_data[k.toLowerCase().replace(re, '')] = v;
             }
         });
 
-        this.options = $.extend(true, {}, Select.defaults, options, meta_data);
+        this.options = $.extend(true, {}, AsSelect.defaults, options, meta_data);
         this.namespace = this.options.namespace;
 
         this.classes = {
@@ -54,11 +54,11 @@
         this.disabled = false;
         this.initialized = false;
 
-        this.$select.trigger('select::init', this);
+        this._trigger('init');
         this.init();
     };
-    Select.prototype = {
-        constructor: Select,
+    AsSelect.prototype = {
+        constructor: AsSelect,
         instances: [],
         init: function() {
             this.$wrapper = this.$select.wrap('<div class="' + this.classes.wrapper + '"><div class="' + this.classes.old + '" ></div></div>').parent().parent();
@@ -101,11 +101,11 @@
             // hold every instance
             this.instances.push(this);
             this.initialized = true;
-            this.$select.trigger('select::ready', this);
+            this._trigger('ready');
         },
         _trigger: function(eventType) {
             // event
-            this.$select.trigger('select::' + eventType, this);
+            this.$select.trigger('asSelect::' + eventType, this);
 
             // callback
             eventType = eventType.replace(/\b\w+\b/g, function(word) {
@@ -333,15 +333,15 @@
         attachInitEvent: function() {
             var self = this;
             if (this.options.trigger === 'hover') {
-                this.$trigger.on('mouseenter.select', function() {
+                this.$trigger.on('mouseenter.asSelect', function() {
                     self.open();
                 });
-                this.$wrapper.on('mouseleave.select', function() {
+                this.$wrapper.on('mouseleave.asSelect', function() {
                     self.close();
                     return false;
                 });
             } else {
-                this.$trigger.on('click.select', function() {
+                this.$trigger.on('click.asSelect', function() {
                     if (self.opened) {
                         self.close();
                     } else {
@@ -350,7 +350,7 @@
                 });
             }
 
-            this.$select.on('focus.select', function() {
+            this.$select.on('focus.asSelect', function() {
                 self.$wrapper.addClass(self.classes.focus);
                 self.inFocus = true;
             }).on('blur', function() {
@@ -358,21 +358,21 @@
                 self.inFocus = false;
             });
 
-            this.$dropdown.on('click.select', '.' + this.classes.item, function() {
+            this.$dropdown.on('click.asSelect', '.' + this.classes.item, function() {
                 var index = self.$items.index($(this));
                 self.select(index);
                 self.close();
             });
         },
         dettachInitEvents: function() {
-            this.$trigger.off('.select');
-            this.$wrap.off('.select');
-            this.$select.off('.select');
-            this.$dropdown.off('.select');
+            this.$trigger.off('.asSelect');
+            this.$wrap.off('.asSelect');
+            this.$select.off('.asSelect');
+            this.$dropdown.off('.asSelect');
         },
         keyboardEvent: function() {
             var self = this;
-            $(document).on('keydown.select', function(e) {
+            $(document).on('keydown.asSelect', function(e) {
                 var key = e.which || e.keycode;
 
                 if (/^(9|13|27)$/.test(key)) {
@@ -447,7 +447,7 @@
                 return;
             }
             this.$mask = $('<div class="' + this.classes.mask + '"></div>').appendTo(this.$wrapper);
-            this.$mask.on('click.select', function() {
+            this.$mask.on('click.asSelect', function() {
                 self.close();
                 return false;
             });
@@ -456,7 +456,7 @@
             if (this.options.trigger === 'hover') {
                 return;
             }
-            this.$mask.off('click.select');
+            this.$mask.off('click.asSelect');
             this.$mask.remove();
             this.$mask = null;
         },
@@ -472,14 +472,14 @@
             this.keyboardEvent();
             this.position();
 
-            this.$select.trigger('select::open', this);
+            this._trigger('open');
             this.opened = true;
         },
         close: function() {
             this.$wrapper.removeClass(this.classes.open);
             this._clearMask();
             $(document).off('keydown.select');
-            this.$select.trigger('select::close', this);
+            this._trigger('close');
             this.opened = false;
         },
         closeAll: function() {
@@ -516,15 +516,15 @@
         },
         destroy: function() {
             this.dettachInitEvents();
-            $(document).off('.select');
+            $(document).off('.asSelect');
 
             this.$dropdown.remove();
             this.$trigger.remove();
             this.$select.unwrap().unwrap();
         }
     };
-    Select.defaults = {
-        namespace: 'select',
+    AsSelect.defaults = {
+        namespace: 'asSelect',
         skin: null,
         trigger: 'click', // 'hover' or 'click'
         offset: [0, 0], // set panel offset to trigger element
@@ -551,21 +551,21 @@
         },
         onChange: function() {}
     };
-    $.fn.select = function(options) {
+    $.fn.asSelect = function(options) {
         if (typeof options === 'string') {
             var method = options;
             var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
 
             return this.each(function() {
-                var api = $.data(this, 'select');
+                var api = $.data(this, 'asSelect');
                 if (typeof api[method] === 'function') {
                     api[method].apply(api, method_arguments);
                 }
             });
         } else {
             return this.each(function() {
-                if (!$.data(this, 'select')) {
-                    $.data(this, 'select', new Select(this, options));
+                if (!$.data(this, 'asSelect')) {
+                    $.data(this, 'asSelect', new AsSelect(this, options));
                 }
             });
         }

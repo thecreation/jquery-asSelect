@@ -1,0 +1,23 @@
+{
+    "name": "asSelect",
+    "title": "jQuery asSelect",
+    "description": "a custom style asSelect plugin",
+    "keywords": [],
+    "version": "0.1.1",
+    "author": {
+        "name": "amazingSurge",
+        "email": "amazingSurge@yahoo.com",
+        "url": "amazingSurge.com"
+    },
+    "bugs": "https://github.com/amazingSurge/jquery-asSelect/issues",
+    "licenses": [{
+        "type": "GPL",
+        "url": "https://github.com/amazingSurge/jquery-asSelect/blob/master/LICENSE-GPL"
+    }],
+    "bugs": "https://github.com/amazingSurge/jquery-asSelect/issues",
+    "homepage": "https://github.com/amazingSurge/jquery-asSelect",
+    "docs": "https://github.com/amazingSurge/jquery-asSelect",
+    "dependencies": {
+        "jquery": ">= 1.8.3"
+    }
+}

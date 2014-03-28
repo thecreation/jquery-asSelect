@@ -6,7 +6,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Select</title>
+        <title>AsSelect</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -14,14 +14,14 @@
         <link rel="stylesheet" href="css/bootstrap.css">
         <link rel="stylesheet" href="css/prism.css">
         <link rel="stylesheet" href="css/main.css">       
-        <link rel="stylesheet" href="css/select.css">
+        <link rel="stylesheet" href="css/asSelect.css">
 
 
         <script src="js/vendor/jquery-1.9.1.min.js"></script>
         <script src="js/vendor/jquery.toc.js"></script>
         <script src="js/vendor/prism.js"></script>
         <script src="js/vendor/bootstrap.js"></script>
-        <script src="../src/jquery-select.js"></script>
+        <script src="../src/jquery-asSelect.js"></script>
         <style type="text/css">
             #paginator-content {
                 height: 100px;
@@ -120,7 +120,7 @@
 &lt;/select&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.custom-select').select({
+        $('.custom-select').asSelect({
             skin: 'simple',
             offset: [0,0],
             onChange: function(data) {
@@ -140,7 +140,7 @@
                 </select>
                 <script>                   
                     $(document).ready(function() {
-                        $('.custom-select').select({
+                        $('.custom-select').asSelect({
                             skin: 'simple',
                             offset: [0,0]
                         }); 
@@ -201,7 +201,7 @@
 &lt;/select&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.group-select').select({
+        $('.group-select').asSelect({
             skin: 'simple',
         });                        
     });
@@ -225,7 +225,7 @@
                 <script>                   
                     $(document).ready(function() {
 
-                        $('.group-select').select({
+                        $('.group-select').asSelect({
                             skin: 'simple'
                         });                        
                     });
@@ -255,17 +255,17 @@
 &lt;button class="select-enable"&gt;click to enable&lt;/button&gt;   
 &lt;button class="select-disabled"&gt;click to disable&lt;/button&gt;               
     $(document).ready(function() {
-        $('.select-disable').select({
+        $('.select-disable').asSelect({
             skin: 'simple',
         }); 
         
         $('.select-enable').on('click', function() {
             // enable
-            $('.select-disable').select('enable'); 
+            $('.select-disable').asSelect('enable'); 
         });
         $('.select-disabled').on('click', function() {
             // here call disable method
-            $('.select-disable').select('disable'); 
+            $('.select-disable').asSelect('disable'); 
         });  
     });
 &lt;/script&gt;
@@ -290,15 +290,15 @@
                 <script>                   
                     $(document).ready(function() {
 
-                        $('.select-disable').select({
+                        $('.select-disable').asSelect({
                             skin: 'simple'
                         });  
                         
                         $('.select-enable').on('click', function() {
-                            $('.select-disable').select('enable'); 
+                            $('.select-disable').asSelect('enable'); 
                         });
                         $('.select-disabled').on('click', function() {
-                            $('.select-disable').select('disable'); 
+                            $('.select-disable').asSelect('disable'); 
                         });                     
                     });
                 </script>
@@ -325,7 +325,7 @@
 &lt;script&gt;                   
     $(document).ready(function() {
 
-        $('.icon-select').select({
+        $('.icon-select').asSelect({
             render:{
                 option: function(item){
                     return '<i class="icon-'+item.icon+'"></i>'+item.text;
@@ -356,7 +356,7 @@
                 <script>                   
                     $(document).ready(function() {
 
-                        $('.icon-select').select({
+                        $('.icon-select').asSelect({
                             render:{
                                 option: function(item){
                                     return '<i class="icon-'+item.icon+'"></i>'+item.text;
@@ -383,7 +383,7 @@
 &lt;/select&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.hover-select').select({
+        $('.hover-select').asSelect({
             trigger: 'hover'
         });                        
     });
@@ -399,7 +399,7 @@
                 </select>
                 <script>                   
                     $(document).ready(function() {
-                        $('.hover-select').select({
+                        $('.hover-select').asSelect({
                             trigger: 'hover'
                         });                        
                     });
@@ -414,7 +414,7 @@
 &lt;div class="build-from-json"&gt;&lt;/div&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.build-from-json').select({
+        $('.build-from-json').asSelect({
             load: function(callback){
                 callback([
                     {"value":"value_1","text":"value 1"},
@@ -428,7 +428,7 @@
             <div class="example">
                 <select class="build-from-json"></select>
                 <script>                   
-                    $('.build-from-json').select({
+                    $('.build-from-json').asSelect({
                         preload: true,
                         load: function(callback){
                             callback([
@@ -448,7 +448,7 @@
 &lt;button class="reset-button"&gt;reset&lt;/button&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.select-scroll').select({
+        $('.select-scroll').asSelect({
             load: function(callback){
                 callback([
                     {"value":"value_1","text":"a-value1"},
@@ -491,7 +491,7 @@
             ]);
         });
         $('.reset-button').on('click', function() {
-            var instance = $('.select-load').data('select');
+            var instance = $('.select-load').data('asSelect');
             instance.data = [
                 {"value":"value_1","text":"a-value1"},
                 {"value":"value_2","text":"a-value2"},
@@ -507,7 +507,7 @@
                 <button class="load-button">click to load data</button>
                 <button class="reset-button">reset</button>
                 <script>                   
-                    $('.select-load').select({
+                    $('.select-load').asSelect({
                         preload: true,
                         load: function(callback){
                             callback([
@@ -518,7 +518,7 @@
                         }
                     });
                     $('.load-button').on('click',function() {
-                        var instance = $('.select-load').data('select');
+                        var instance = $('.select-load').data('asSelect');
                         instance.addData([
                             {"value":"value_4","text":"a-value4"},
                             {"value":"value_5","text":"a-value5"},
@@ -569,7 +569,7 @@
 &lt;div class="select-scroll"&gt;&lt;/div&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.select-scroll').select({
+        $('.select-scroll').asSelect({
             load: function(callback){
                 callback([
                     {"value":"value_1","text":"a-value1"},
@@ -612,7 +612,7 @@
             <div class="example">
                 <select class="select-scroll"></select>
                 <script>                   
-                    $('.select-scroll').select({
+                    $('.select-scroll').asSelect({
                         preload: true,
                         load: function(callback){
                             callback([
@@ -663,7 +663,7 @@
 &lt;div class="build-with-group"&gt;&lt;/div&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.build-with-group').select({
+        $('.build-with-group').asSelect({
             load: function(callback){
                 callback([
                     {"label":"group","options":[
@@ -680,7 +680,7 @@
             <div class="example">
                 <select class="build-with-group"></select>
                 <script>
-                    $('.build-with-group').select({
+                    $('.build-with-group').asSelect({
                         preload: true,
                         load: function(callback){
                             callback([
@@ -701,7 +701,7 @@
 &lt;div class="build-use-load"&gt;&lt;/div&gt;
 &lt;script&gt;                   
     $(document).ready(function() {
-        $('.build-use-load').select({
+        $('.build-use-load').asSelect({
             valueField: 'url',
             labelField: 'name',
             preload: true,
@@ -739,7 +739,7 @@
             <div class="example">
                 <select class="build-use-load"></select>
                 <script>                   
-                    $('.build-use-load').select({
+                    $('.build-use-load').asSelect({
                         valueField: 'url',
                         labelField: 'name',
                         preload: true,
