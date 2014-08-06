@@ -142,30 +142,29 @@
                     $(document).ready(function() {
                         $('.custom-select').asSelect({
                             skin: 'simple',
-                            offset: [0,0]
+                            offset: [0,0],
                         }); 
-                        $('.custom-select').on('select::trigger', function(event, data) {
+                        $('.custom-select').on('asSelect::trigger', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::change', function(event, data) {
-                            console.log(data);
-                            var text = event.type + ': triggered;' + ' value: ' + data.value;
+                        $('.custom-select').on('asSelect::change', function(event, data) {
+                            var text = event.type + ': triggered;' + ' value: ' + data.element.value;
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::open', function(event, data) {
+                        $('.custom-select').on('asSelect::open', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::close', function(event, data) {
+                        $('.custom-select').on('asSelect::close', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::option::mouseenter', function(event, data) {
+                        $('.custom-select').on('asSelect::option::mouseenter', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
-                        $('.custom-select').on('select::option::mouseleave', function(event, data) {
+                        $('.custom-select').on('asSelect::option::mouseleave', function(event, data) {
                             var text = event.type + ': triggered';
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         });                        

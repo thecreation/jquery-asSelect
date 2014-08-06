@@ -300,6 +300,32 @@
 
             return result;
         },
+        getCurrentIndex: function(data) {
+            var count = 0;
+                index = 0;
+            $.each(this.data, function(i, item) {
+                if (item.group) {
+                    if ($.isArray(item.options)) {
+                        $.each(item.options, function(j, option) {
+                            if (option.value === data) {
+                                index = count;
+                            }
+                            count++;
+                        });
+                    }
+                } else {
+                    if (item.value === data) {
+                        index = count;
+                    }
+                    count++;
+                }
+            });
+
+            return index;
+        },
+        get: function() {
+            return this.getCurrentData(this.currentIndex).value;
+        },
         replaceDiacritics: function(s) {
             // /[\340-\346]/g, // a
             // /[\350-\353]/g, // e
