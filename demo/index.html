@@ -149,7 +149,8 @@
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
                         $('.custom-select').on('asSelect::change', function(event, data) {
-                            var text = event.type + ': triggered;' + ' value: ' + data.element.value;
+                            console.log(data)
+                            var text = event.type + ': triggered;' + ' value: ' + data.value;
                             $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
                         }); 
                         $('.custom-select').on('asSelect::open', function(event, data) {

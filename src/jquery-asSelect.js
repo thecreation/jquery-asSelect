@@ -104,15 +104,22 @@
             this._trigger('ready');
         },
         _trigger: function(eventType) {
+            var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined,
+                data;
+            if (method_arguments) {
+                data = method_arguments;
+                data.push(self);
+            }else {
+                data = self;
+            }
             // event
-            this.$select.trigger('asSelect::' + eventType, this);
+            this.$select.trigger('asSelect::' + eventType, data);
 
             // callback
             eventType = eventType.replace(/\b\w+\b/g, function(word) {
                 return word.substring(0, 1).toUpperCase() + word.substring(1);
             });
             var onFunction = 'on' + eventType;
-            var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
             if (typeof this.options[onFunction] === 'function') {
                 this.options[onFunction].apply(this, method_arguments);
             }
@@ -274,7 +281,7 @@
 
             if (this.last !== this.currentIndex) {
                 // pass source data object 
-                this._trigger('change', this.getCurrentData(index));
+                this._trigger('change', this.getCurrentData(index).value, this.options.name, 'asSelect');
             }
         },
         getCurrentData: function(index) {
