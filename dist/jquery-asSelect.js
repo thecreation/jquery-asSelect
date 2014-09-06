@@ -100,7 +100,7 @@
         },
         _trigger: function(eventType) {
             var method_arguments = Array.prototype.slice.call(arguments, 1),
-                data = method_arguments.concat([this]);
+                data = [this].concat(method_arguments);
 
             // event
             this.$select.trigger('asSelect::' + eventType, data);
