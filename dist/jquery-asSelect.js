@@ -1,4 +1,4 @@
-/*! jquery asSelect - v0.1.1 - 2014-08-18
+/*! jquery asSelect - v0.1.2 - 2014-09-06
 * https://github.com/amazingSurge/jquery-asSelect
 * Copyright (c) 2014 amazingSurge; Licensed MIT */
 (function($) {
@@ -99,14 +99,9 @@
             this._trigger('ready');
         },
         _trigger: function(eventType) {
-            var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined,
-                data;
-            if (method_arguments) {
-                data = method_arguments;
-                data.push(self);
-            }else {
-                data = self;
-            }
+            var method_arguments = Array.prototype.slice.call(arguments, 1),
+                data = method_arguments.concat([this]);
+
             // event
             this.$select.trigger('asSelect::' + eventType, data);
 
@@ -122,7 +117,9 @@
         onLoad: function() {
             var self = this;
             var fn = self.options.load;
-            if (!fn) return;
+            if (!fn) {
+                return;
+            }
             self.load(function(callback) {
                 fn.apply(self, [callback]);
             });
@@ -232,7 +229,9 @@
         },
         update: function(noFreshOptions) {
             this.render(this.data);
-            noFreshOptions && this.freshOptions(this.data);
+            if (noFreshOptions !== true) {
+                this.freshOptions(this.data);
+            }
 
             this.$items = this.$dropdown.find('.' + this.classes.item);
             this.$options = this.$select.find('option');
@@ -259,7 +258,9 @@
         },
         select: function(index) {
             if (typeof index === 'number' && index >= 0) {
-                this.isScroll && this.scrollToVisibility(index);
+                if (this.isScroll) {
+                    this.scrollToVisibility(index);
+                }
                 this._set(index);
             }
         },
@@ -270,7 +271,9 @@
             this.currentIndex = index;
             this.$label.text($item.text());
 
-            this.$options.length && $(this.$options[index]).prop('selected', true);
+            if (this.$options.length) {
+                $(this.$options[index]).prop('selected', true);
+            }
             this.$items.removeClass(this.classes.selected);
             $item.addClass(this.classes.selected);
 
@@ -303,7 +306,7 @@
             return result;
         },
         getCurrentIndex: function(data) {
-            var count = 0;
+            var count = 0,
                 index = 0;
             $.each(this.data, function(i, item) {
                 if (item.group) {
@@ -338,8 +341,9 @@
             // /[\347]/g, // c
             // /[\377]/g // y
             var k, d = '40-46 50-53 54-57 62-70 71-74 61 47 77'.replace(/\d+/g, '\\3$&').split(' ');
-            for (k in d)
-                s = s.toLowerCase().replace(RegExp('[' + d[k] + ']', 'g'), 'aeiouncy'.charAt(k));
+            for (k in d) {
+                s = s.toLowerCase().replace(new RegExp('[' + d[k] + ']', 'g'), 'aeiouncy'.charAt(k));
+            }
             return s;
         },
         position: function() {
@@ -411,7 +415,9 @@
 
                 if (key < 37 || key > 40) {
                     // search
-                    self.isScroll && self.search.call(self, key);
+                    if (self.isScroll) {
+                        self.search.call(self, key);
+                    }
                 } else if (/^(38|40)$/.test(key)) {
                     // key navigate
                     var direction = key === 38 ? 'up' : 'down';
@@ -425,7 +431,7 @@
             var searchString = '',
                 currentIndex;
             clearTimeout(this.timeout);
-            searchString = RegExp('^' + (searchString += String.fromCharCode(key)), 'i');
+            searchString = new RegExp('^' + (searchString += String.fromCharCode(key)), 'i');
             this.timeout = setTimeout(function() {
                 searchString = '';
             }, 16);
@@ -582,14 +588,23 @@
     $.fn.asSelect = function(options) {
         if (typeof options === 'string') {
             var method = options;
-            var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
+            var method_arguments = Array.prototype.slice.call(arguments, 1);
 
-            return this.each(function() {
-                var api = $.data(this, 'asSelect');
-                if (typeof api[method] === 'function') {
-                    api[method].apply(api, method_arguments);
+            if (/^\_/.test(method)) {
+                return false;
+            } else if ((/^(get)/.test(method))) {
+                var api = this.first().data('asSelect');
+                if (api && typeof api[method] === 'function') {
+                    return api[method].apply(api, method_arguments);
                 }
-            });
+            } else {
+                return this.each(function() {
+                    var api = $.data(this, 'asSelect');
+                    if (api && typeof api[method] === 'function') {
+                        api[method].apply(api, method_arguments);
+                    }
+                });
+            }
         } else {
             return this.each(function() {
                 if (!$.data(this, 'asSelect')) {

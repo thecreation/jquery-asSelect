@@ -1,6 +1,6 @@
 # jQuery asSelect
 
-The powerful jQuery plugin that creates a custom asSelect. <a href="http://amazingsurge.github.io/jquery-asSelect/">Project page and demos</a><br />
+The powerful jQuery plugin that creates a custom asSelect. 
 Download: <a href="https://github.com/amazingSurge/jquery-asSelect/archive/master.zip">jquery-asSelect-master.zip</a>
 
 ***
@@ -135,12 +135,6 @@ $(document).on('change', function(event,instance) {
 jquery-asSelect is verified to work in Internet Explorer 7+, Firefox 2+, Opera 9+, Google Chrome and Safari browsers. Should also work in many others.
 
 Mobile browsers (like Opera mini, Chrome mobile, Safari mobile, Android browser and others) is coming soon.
-
-## Changes
-
-| Version | Notes                                                            |
-|---------|------------------------------------------------------------------|
-|     ... | ...                                                              |
 
 ## Author
 [amazingSurge](http://amazingSurge.com)
