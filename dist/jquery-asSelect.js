@@ -1,41 +1,156 @@
-/*! jquery asSelect - v0.1.2 - 2014-09-06
+/**
+* jQuery asSelect v0.2.0
 * https://github.com/amazingSurge/jquery-asSelect
-* Copyright (c) 2014 amazingSurge; Licensed MIT */
-(function($) {
-    var AsSelect = $.asSelect = function(element, options) {
+*
+* Copyright (c) amazingSurge
+* Released under the LGPL-3.0 license
+*/
+(function(global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(['jquery'], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(require('jquery'));
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(global.jQuery);
+    global.jqueryAsSelectEs = mod.exports;
+  }
+})(this,
+
+  function(_jquery) {
+    'use strict';
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+      return obj && obj.__esModule ? obj : {
+        default: obj
+      };
+    }
+
+    var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ?
+
+      function(obj) {
+        return typeof obj;
+      }
+      :
+
+      function(obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+      };
+
+    function _classCallCheck(instance, Constructor) {
+      if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+      }
+    }
+
+    var _createClass = function() {
+      function defineProperties(target, props) {
+        for (var i = 0; i < props.length; i++) {
+          var descriptor = props[i];
+          descriptor.enumerable = descriptor.enumerable || false;
+          descriptor.configurable = true;
+
+          if ("value" in descriptor)
+            descriptor.writable = true;
+          Object.defineProperty(target, descriptor.key, descriptor);
+        }
+      }
+
+      return function(Constructor, protoProps, staticProps) {
+        if (protoProps)
+          defineProperties(Constructor.prototype, protoProps);
+
+        if (staticProps)
+          defineProperties(Constructor, staticProps);
+
+        return Constructor;
+      };
+    }();
+
+    /*eslint no-empty-function: "off"*/
+
+    var DEFAULTS = {
+      namespace: 'asSelect',
+      skin: null,
+      trigger: 'click', // 'hover' or 'click'
+      offset: [0, 0], // set panel offset to trigger element
+      json: null, // if is a object,it will build from the object
+      preload: false, // preload some data set in load option
+      load: null, // preload data set here
+      maxHeight: 350, // set panel maxHeight, lists' height is bigger than maxHeight, scroll bar will show
+      select: undefined, // set initial selest value
+
+      render: {
+        label: function label(selected) {
+          if (selected) {
+
+            return selected.text;
+          }
+
+          return 'Choose one';
+        },
+        option: function option(item) {
+          return item.text;
+        },
+        group: function group(item) {
+          return item.label;
+        }
+      },
+
+      onChange: function onChange() {}
+    };
+
+    var NAMESPACE$1 = 'asSelect';
+    var instances = [];
+    /**
+     * Plugin constructor
+     **/
+
+    var asSelect = function() {
+      function asSelect(element, options) {
+        _classCallCheck(this, asSelect);
+
         this.element = element;
-        this.$select = $(element);
+        this.$select = (0, _jquery2.default)(element);
 
         // options
-        var meta_data = [];
-        $.each(this.$select.data(), function(k, v) {
-            var re = new RegExp("^asSelect", "i");
-            if (re.test(k)) {
-                meta_data[k.toLowerCase().replace(re, '')] = v;
-            }
-        });
+        var metas = [];
+        _jquery2.default.each(this.$select.data(),
 
-        this.options = $.extend(true, {}, AsSelect.defaults, options, meta_data);
+          function(k, v) {
+            var re = new RegExp("^asSelect", "i");
+
+            if (re.test(k)) {
+              metas[k.toLowerCase().replace(re, '')] = v;
+            }
+          }
+        );
+
+        this.options = _jquery2.default.extend(true, {}, DEFAULTS, options, metas);
         this.namespace = this.options.namespace;
 
         this.classes = {
-            wrapper: this.namespace + '-wrapper',
-            old: this.namespace + '-old',
-            dropdown: this.namespace + '-dropdown',
-            trigger: this.namespace + '-trigger',
-            label: this.namespace + '-label',
-            handler: this.namespace + '-handler',
-            item: this.namespace + '-item',
-            group: this.namespace + '-group',
-            mask: this.namespace + '-mask',
+          wrapper: this.namespace + '-wrapper',
+          old: this.namespace + '-old',
+          dropdown: this.namespace + '-dropdown',
+          trigger: this.namespace + '-trigger',
+          label: this.namespace + '-label',
+          handler: this.namespace + '-handler',
+          item: this.namespace + '-item',
+          group: this.namespace + '-group',
+          mask: this.namespace + '-mask',
 
-            skin: this.namespace + '_' + this.options.skin,
-            open: this.namespace + '_open',
-            disabled: this.namespace + '_disabled',
-            selected: this.namespace + '_selected',
-            focus: this.namespace + '_focus',
-            loading: this.namespace + '_loading',
-            error: this.namespace + '_error'
+          skin: this.namespace + '_' + this.options.skin,
+          open: this.namespace + '_open',
+          disabled: this.namespace + '_disabled',
+          selected: this.namespace + '_selected',
+          focus: this.namespace + '_focus',
+          loading: this.namespace + '_loading',
+          error: this.namespace + '_error'
         };
 
         // flag
@@ -51,566 +166,812 @@
 
         this._trigger('init');
         this.init();
-    };
-    AsSelect.prototype = {
-        constructor: AsSelect,
-        instances: [],
-        init: function() {
-            this.$wrapper = this.$select.wrap('<div class="' + this.classes.wrapper + '"><div class="' + this.classes.old + '" ></div></div>').parent().parent();
-            this.$trigger = $('<div class="' + this.classes.trigger + '"><div class="' + this.classes.handler + '"></div></div>');
-            this.$label = $('<div class="' + this.classes.label + '">' + this.options.render.label() + '</div>').prependTo(this.$trigger);
-            this.$dropdown = $('<div class="' + this.classes.dropdown + '"><ul></ul></div>');
-            this.$ul = this.$dropdown.children('ul');
-            this.$options = this.$select.find('option');
+      }
 
-            if (this.options.skin) {
-                this.$wrapper.addClass(this.classes.skin);
+      _createClass(asSelect, [{
+        key: 'init',
+        value: function init() {
+          this.$wrapper = this.$select.wrap('<div class="' + this.classes.wrapper + '"><div class="' + this.classes.old + '" ></div></div>').parent().parent();
+          this.$trigger = (0, _jquery2.default)('<div class="' + this.classes.trigger + '"><div class="' + this.classes.handler + '"></div></div>');
+          this.$label = (0, _jquery2.default)('<div class="' + this.classes.label + '">' + this.options.render.label() + '</div>').prependTo(this.$trigger);
+          this.$dropdown = (0, _jquery2.default)('<div class="' + this.classes.dropdown + '"><ul></ul></div>');
+          this.$ul = this.$dropdown.children('ul');
+          this.$options = this.$select.find('option');
+
+          if (this.options.skin) {
+            this.$wrapper.addClass(this.classes.skin);
+          }
+
+          if (this.$select.prop('disabled')) {
+            this.disable();
+          }
+
+          this.unChooseText = this.$label.text();
+          this.$dropdown.css('maxHeight', this.options.maxHeight);
+
+          // parse data from select label
+          this.data = this.parse(this.$select.children());
+
+          // render html from data
+          this.update(true);
+
+          // add to page
+          this.$wrapper.append(this.$trigger).append(this.$dropdown);
+
+          // attach event
+          this.attachInitEvent();
+
+          // set initial value
+          // this.select(this.currentIndex);
+
+          if (this.options.preload) {
+            this.onLoad();
+          }
+
+          // hold every instance
+          instances.push(this);
+          this.initialized = true;
+          this._trigger('ready');
+        }
+      }, {
+        key: '_trigger',
+        value: function _trigger(eventType) {
+          var _ref;
+
+          for (var _len = arguments.length, params = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            params[_key - 1] = arguments[_key];
+          }
+
+          var data = (_ref = [this]).concat.apply(_ref, params);
+
+          // event
+          this.$select.trigger(NAMESPACE$1 + '::' + eventType, data);
+
+          // callback
+          eventType = eventType.replace(/\b\w+\b/g,
+
+            function(word) {
+              return word.substring(0, 1).toUpperCase() + word.substring(1);
             }
+          );
+          var onFunction = 'on' + eventType;
 
-            if (this.$select.prop('disabled')) {
-                this.disable();
+          if (typeof this.options[onFunction] === 'function') {
+            var _options$onFunction;
+
+            (_options$onFunction = this.options[onFunction]).apply.apply(_options$onFunction, [this].concat(params));
+          }
+        }
+      }, {
+        key: 'onLoad',
+        value: function onLoad() {
+          var _this = this;
+
+          var fn = this.options.load;
+
+          if (!fn) {
+
+            return;
+          }
+          this.load(
+
+            function(callback) {
+              fn.apply(_this, [callback]);
             }
+          );
+        }
+      }, {
+        key: 'load',
+        value: function load(fn) {
+          var that = this;
+          that.$wrapper.addClass(that.classes.loading);
 
-            this.unChooseText = this.$label.text();
-            this.$dropdown.css('maxHeight', this.options.maxHeight);
+          that.loading++;
+          fn.apply(that, [
 
-            // parse data from select label
-            this.data = this.parse(this.$select.children());
+            function(results) {
+              that.loading = Math.max(that.loading - 1, 0);
 
-            // render html from data
-            this.update(true);
+              if (results && results.length) {
+                that.addData(results);
+              }
 
-            // add to page
-            this.$wrapper.append(this.$trigger).append(this.$dropdown);
+              if (!that.loading) {
+                that.$wrapper.removeClass('loading');
+              }
 
-            // attach event
-            this.attachInitEvent();
-
-            // set initial value
-            // this.select(this.currentIndex);
-
-            if (this.options.preload) {
-                this.onLoad();
+              that._trigger('load', results);
             }
+          ]);
+        }
+      }, {
+        key: 'render',
+        value: function render(data) {
+          var html = '';
+          var that = this;
+          var buildOption = function buildOption(item) {
+            return '<li class="' + that.classes.item + '">' + that.options.render.option.call(that, item) + '</li>';
+          };
 
-            // hold every instance
-            this.instances.push(this);
-            this.initialized = true;
-            this._trigger('ready');
-        },
-        _trigger: function(eventType) {
-            var method_arguments = Array.prototype.slice.call(arguments, 1),
-                data = [this].concat(method_arguments);
+          _jquery2.default.each(data,
 
-            // event
-            this.$select.trigger('asSelect::' + eventType, data);
+            function(i, item) {
+              if (item.group) {
+                html += '<li class="' + that.classes.group + '">';
 
-            // callback
-            eventType = eventType.replace(/\b\w+\b/g, function(word) {
-                return word.substring(0, 1).toUpperCase() + word.substring(1);
-            });
-            var onFunction = 'on' + eventType;
-            if (typeof this.options[onFunction] === 'function') {
-                this.options[onFunction].apply(this, method_arguments);
-            }
-        },
-        onLoad: function() {
-            var self = this;
-            var fn = self.options.load;
-            if (!fn) {
-                return;
-            }
-            self.load(function(callback) {
-                fn.apply(self, [callback]);
-            });
-        },
-        load: function(fn) {
-            var self = this;
-            self.$wrapper.addClass(self.classes.loading);
+                html += '<div class="' + that.namespace + '-group-label">' + that.options.render.group.call(that, item) + '</div>';
+                html += '<ul>';
 
-            self.loading++;
-            fn.apply(self, [
+                if (_jquery2.default.isArray(item.options)) {
+                  _jquery2.default.each(item.options,
 
-                function(results) {
-                    self.loading = Math.max(self.loading - 1, 0);
-                    if (results && results.length) {
-                        self.addData(results);
+                    function(j, option) {
+                      html += buildOption(option);
                     }
-                    if (!self.loading) {
-                        self.$wrapper.removeClass('loading');
-                    }
-
-                    self._trigger('load', results);
+                  );
                 }
-            ]);
-        },
-        render: function(data) {
-            var html = '',
-                self = this;
-            var buildOption = function(item) {
-                return '<li class="' + self.classes.item + '">' + self.options.render.option.call(self, item) + '</li>';
-            };
-            $.each(data, function(i, item) {
+
+                html += '</ul>';
+                html += '</li>';
+              } else {
+                html += buildOption(item);
+              }
+            }
+          );
+
+          that.$ul.html(html);
+        }
+      }, {
+        key: 'freshOptions',
+        value: function freshOptions(data) {
+          var that = this;
+          var html = '';
+
+          var buildOption = function buildOption(item) {
+            return '<option value="' + item.value + '">' + item.text + '</option>';
+          };
+
+          if (_jquery2.default.isArray(data)) {
+            _jquery2.default.each(data,
+
+              function(i, item) {
                 if (item.group) {
-                    html += '<li class="' + self.classes.group + '">';
+                  html += '<optgroup label="' + item.label + '">';
 
-                    html += '<div class="' + self.namespace + '-group-label">' + self.options.render.group.call(self, item) + '</div>';
-                    html += '<ul>';
-                    if ($.isArray(item.options)) {
-                        $.each(item.options, function(j, option) {
-                            html += buildOption(option);
-                        });
-                    }
-                    html += '</ul>';
-                    html += '</li>';
+                  if (_jquery2.default.isArray(item.options)) {
+                    _jquery2.default.each(item.options,
+
+                      function(j, option) {
+                        html += buildOption(option);
+                      }
+                    );
+                  }
+
+                  html += '</optgroup>';
                 } else {
-                    html += buildOption(item);
+                  html += buildOption(item);
                 }
+              }
+            );
+          }
+
+          that.$select.html(html);
+        }
+      }, {
+        key: 'parse',
+        value: function parse($selects) {
+          var that = this;
+          var data = [];
+
+          var optionToData = function optionToData() {
+            return _jquery2.default.extend({}, (0, _jquery2.default)(this).data(), {
+              'value': this.value,
+              'text': this.text,
+              'slug': that.replaceDiacritics(this.text)
             });
-            self.$ul.html(html);
-        },
-        freshOptions: function(data) {
-            var self = this,
-                html = '';
-            var buildOption = function(item) {
-                return '<option value="' + item.value + '">' + item.text + '</option>';
-            };
-            if ($.isArray(data)) {
-                $.each(data, function(i, item) {
-                    if (item.group) {
-                        html += '<optgroup label="' + item.label + '">';
-                        if ($.isArray(item.options)) {
-                            $.each(item.options, function(j, option) {
-                                html += buildOption(option);
-                            });
-                        }
-                        html += '</optgroup>';
-                    } else {
-                        html += buildOption(item);
+          };
+
+          $selects.each(
+
+            function() {
+              var _this2 = this;
+
+              if (this.tagName.toLowerCase() === 'optgroup') {
+                (function() {
+                  var group = _jquery2.default.extend({}, (0, _jquery2.default)(_this2).data(), {
+                    'group': true,
+                    'label': _this2.label,
+                    'options': []
+                  });
+
+                  (0, _jquery2.default)(_this2).children().each(
+
+                    function() {
+                      group.options.push(optionToData.call(this));
                     }
-                });
+                  );
+                  data.push(group);
+                })();
+              } else {
+                data.push(optionToData.call(this));
+              }
             }
-            self.$select.html(html);
-        },
-        parse: function($selects) {
-            var self = this;
-            var data = [];
+          );
 
-            var optionToData = function() {
-                return $.extend({}, $(this).data(), {
-                    'value': this.value,
-                    'text': this.text,
-                    'slug': self.replaceDiacritics(this.text)
-                });
-            };
+          this.$options.each(
 
-            $selects.each(function() {
-                if (this.tagName.toLowerCase() === 'optgroup') {
-                    var group = $.extend({}, $(this).data(), {
-                        'group': true,
-                        'label': this.label,
-                        'options': []
-                    });
-
-                    $(this).children().each(function() {
-                        group.options.push(optionToData.call(this));
-                    });
-                    data.push(group);
-                } else {
-                    data.push(optionToData.call(this));
-                }
-            });
-            this.$options.each(function(key, option) {
-                if ($(option).prop('selected')) {
-                    self.currentIndex = key;
-                }
-            });
-            return data;
-        },
-        update: function(noFreshOptions) {
-            this.render(this.data);
-            if (noFreshOptions !== true) {
-                this.freshOptions(this.data);
+            function(key, option) {
+              if ((0, _jquery2.default)(option).prop('selected')) {
+                that.currentIndex = key;
+              }
             }
+          );
 
-            this.$items = this.$dropdown.find('.' + this.classes.item);
-            this.$options = this.$select.find('option');
-            this.total = this.$items.length;
-            this.last = 0;
+          return data;
+        }
+      }, {
+        key: 'update',
+        value: function update(noFreshOptions) {
+          this.render(this.data);
 
-            if (this.initialized) {
-                this.currentIndex = 0;
+          if (noFreshOptions !== true) {
+            this.freshOptions(this.data);
+          }
+
+          this.$items = this.$dropdown.find('.' + this.classes.item);
+          this.$options = this.$select.find('option');
+          this.total = this.$items.length;
+          this.last = 0;
+
+          if (this.initialized) {
+            this.currentIndex = 0;
+          }
+
+          this.$wrapper.removeClass(this.classes.error);
+
+          if (this.$dropdown.height() > this.$ul.outerHeight()) {
+            this.isScroll = true;
+          } else {
+            this.isScroll = false;
+          }
+
+          if (this.currentIndex >= 0) {
+            this._set(this.currentIndex);
+          } else {
+            this.$label.text(this.unChooseText);
+          }
+        }
+      }, {
+        key: 'select',
+        value: function select(index) {
+          if (typeof index === 'number' && index >= 0) {
+
+            if (this.isScroll) {
+              this.scrollToVisibility(index);
             }
+            this._set(index);
+          }
+        }
+      }, {
+        key: '_set',
+        value: function _set(index) {
+          var item = this.$items[index];
+          var $item = (0, _jquery2.default)(item);
+          this.last = this.currentIndex;
+          this.currentIndex = index;
+          this.$label.text($item.text());
 
-            this.$wrapper.removeClass(this.classes.error);
+          if (this.$options.length) {
+            (0, _jquery2.default)(this.$options[index]).prop('selected', true);
+          }
+          this.$items.removeClass(this.classes.selected);
+          $item.addClass(this.classes.selected);
 
-            if (this.$dropdown.height() > this.$ul.outerHeight()) {
-                this.isScroll = true;
-            } else {
-                this.isScroll = false;
-            }
+          if (this.last !== this.currentIndex) {
+            // pass source data object
+            this._trigger('change', [this.getCurrentData(index).value]);
+          }
+        }
+      }, {
+        key: 'getCurrentData',
+        value: function getCurrentData(index) {
+          var count = 0;
+          var result = null;
+          _jquery2.default.each(this.data,
 
-            if (this.currentIndex >= 0) {
-                this._set(this.currentIndex);
-            } else {
-                this.$label.text(this.unChooseText);
-            }
-        },
-        select: function(index) {
-            if (typeof index === 'number' && index >= 0) {
-                if (this.isScroll) {
-                    this.scrollToVisibility(index);
-                }
-                this._set(index);
-            }
-        },
-        _set: function(index) {
-            var item = this.$items[index],
-                $item = $(item);
-            this.last = this.currentIndex;
-            this.currentIndex = index;
-            this.$label.text($item.text());
+            function(i, item) {
+              if (item.group) {
 
-            if (this.$options.length) {
-                $(this.$options[index]).prop('selected', true);
-            }
-            this.$items.removeClass(this.classes.selected);
-            $item.addClass(this.classes.selected);
+                if (_jquery2.default.isArray(item.options)) {
+                  _jquery2.default.each(item.options,
 
-            if (this.last !== this.currentIndex) {
-                // pass source data object 
-                this._trigger('change', this.getCurrentData(index).value, this.options.name, 'asSelect');
-            }
-        },
-        getCurrentData: function(index) {
-            var count = 0,
-                result = null;
-            $.each(this.data, function(i, item) {
-                if (item.group) {
-                    if ($.isArray(item.options)) {
-                        $.each(item.options, function(j, option) {
-                            count++;
-                            if (index + 1 === count) {
-                                result = option;
-                            }
-                        });
+                    function(j, option) {
+                      count++;
+
+                      if (index + 1 === count) {
+                        result = option;
+                      }
                     }
-                } else {
-                    count++;
-                    if (index + 1 === count) {
-                        result = item;
-                    }
+                  );
                 }
-            });
+              } else {
+                count++;
 
-            return result;
-        },
-        getCurrentIndex: function(data) {
-            var count = 0,
-                index = 0;
-            $.each(this.data, function(i, item) {
-                if (item.group) {
-                    if ($.isArray(item.options)) {
-                        $.each(item.options, function(j, option) {
-                            if (option.value === data) {
-                                index = count;
-                            }
-                            count++;
-                        });
-                    }
-                } else {
-                    if (item.value === data) {
+                if (index + 1 === count) {
+                  result = item;
+                }
+              }
+            }
+          );
+
+          return result;
+        }
+      }, {
+        key: 'getCurrentIndex',
+        value: function getCurrentIndex(data) {
+          var count = 0;
+          var index = 0;
+          _jquery2.default.each(this.data,
+
+            function(i, item) {
+              if (item.group) {
+
+                if (_jquery2.default.isArray(item.options)) {
+                  _jquery2.default.each(item.options,
+
+                    function(j, option) {
+                      if (option.value === data) {
                         index = count;
+                      }
+                      count++;
                     }
-                    count++;
+                  );
                 }
-            });
+              } else {
 
-            return index;
-        },
-        get: function() {
-            return this.getCurrentData(this.currentIndex).value;
-        },
-        replaceDiacritics: function(s) {
-            // /[\340-\346]/g, // a
-            // /[\350-\353]/g, // e
-            // /[\354-\357]/g, // i
-            // /[\362-\370]/g, // o
-            // /[\371-\374]/g, // u
-            // /[\361]/g, // n
-            // /[\347]/g, // c
-            // /[\377]/g // y
-            var k, d = '40-46 50-53 54-57 62-70 71-74 61 47 77'.replace(/\d+/g, '\\3$&').split(' ');
-            for (k in d) {
+                if (item.value === data) {
+                  index = count;
+                }
+                count++;
+              }
+            }
+          );
+
+          return index;
+        }
+      }, {
+        key: 'get',
+        value: function get() {
+          return this.getCurrentData(this.currentIndex).value;
+        }
+      }, {
+        key: 'replaceDiacritics',
+        value: function replaceDiacritics(s) {
+          // /[\340-\346]/g, // a
+          // /[\350-\353]/g, // e
+          // /[\354-\357]/g, // i
+          // /[\362-\370]/g, // o
+          // /[\371-\374]/g, // u
+          // /[\361]/g, // n
+          // /[\347]/g, // c
+          // /[\377]/g // y
+
+          var d = '40-46 50-53 54-57 62-70 71-74 61 47 77'.replace(/\d+/g, '\\3$&').split(' ');
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+
+            for (var _iterator = d[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var k = _step.value;
+
+              if (Object.hasOwnProperty.call(d, k)) {
                 s = s.toLowerCase().replace(new RegExp('[' + d[k] + ']', 'g'), 'aeiouncy'.charAt(k));
+              }
             }
-            return s;
-        },
-        position: function() {
-            var height = this.$trigger.outerHeight(true),
-                offset = this.$trigger.offset(),
-                contentHeight = this.$dropdown.outerHeight(true),
-                top;
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
 
-            if (contentHeight + offset.top > $(window).height() + $(window).scrollTop()) {
-                top = -contentHeight - parseInt(this.options.offset[0], 10);
-            } else {
-                top = height + parseInt(this.options.offset[0], 10);
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
             }
+          }
 
-            this.$dropdown.css({
-                top: top,
-            });
-        },
-        attachInitEvent: function() {
-            var self = this;
-            if (this.options.trigger === 'hover') {
-                this.$trigger.on('mouseenter.asSelect', function() {
-                    self.open();
-                });
-                this.$wrapper.on('mouseleave.asSelect', function() {
-                    self.close();
-                    return false;
-                });
-            } else {
-                this.$trigger.on('click.asSelect', function() {
-                    if (self.opened) {
-                        self.close();
-                    } else {
-                        self.open();
-                    }
-                });
-            }
-
-            this.$select.on('focus.asSelect', function() {
-                self.$wrapper.addClass(self.classes.focus);
-                self.inFocus = true;
-            }).on('blur', function() {
-                self.$wrapper.removeClass(self.classes.focus);
-                self.inFocus = false;
-            });
-
-            this.$dropdown.on('click.asSelect', '.' + this.classes.item, function() {
-                var index = self.$items.index($(this));
-                self.select(index);
-                self.close();
-            });
-        },
-        dettachInitEvents: function() {
-            this.$trigger.off('.asSelect');
-            this.$wrap.off('.asSelect');
-            this.$select.off('.asSelect');
-            this.$dropdown.off('.asSelect');
-        },
-        keyboardEvent: function() {
-            var self = this;
-            $(document).on('keydown.asSelect', function(e) {
-                var key = e.which || e.keycode;
-
-                if (/^(9|13|27)$/.test(key)) {
-                    // close shortcut
-                    self.close();
-                    return false;
-                }
-
-                if (key < 37 || key > 40) {
-                    // search
-                    if (self.isScroll) {
-                        self.search.call(self, key);
-                    }
-                } else if (/^(38|40)$/.test(key)) {
-                    // key navigate
-                    var direction = key === 38 ? 'up' : 'down';
-                    self.navigate(direction);
-                    return false;
-                }
-
-            });
-        },
-        search: function(key) {
-            var searchString = '',
-                currentIndex;
-            clearTimeout(this.timeout);
-            searchString = new RegExp('^' + (searchString += String.fromCharCode(key)), 'i');
-            this.timeout = setTimeout(function() {
-                searchString = '';
-            }, 16);
-
-            $.each(this.$items, function(index, value) {
-                var string = $.trim($(value).text());
-                if (searchString.test(string)) {
-                    currentIndex = index;
-                    return false;
-                }
-            });
-            if (currentIndex >= 0) {
-                this.select(currentIndex);
-            }
-        },
-        scrollToVisibility: function(index) {
-            var item = this.$items[index],
-                scrollTop,
-                itemHeight = $(item).outerHeight(),
-                oriScrollTop = this.$dropdown.scrollTop(),
-                bottom = oriScrollTop + this.$dropdown.height(),
-                distance = $(item).position().top;
-
-            if (distance < oriScrollTop) {
-                scrollTop = distance;
-            } else if (distance > bottom - itemHeight) {
-                scrollTop = distance + itemHeight - this.$dropdown.height();
-            } else {
-                return;
-            }
-            this.$dropdown.scrollTop(scrollTop);
-        },
-        navigate: function(direction) {
-            var total = this.total,
-                index = this.currentIndex < 0 ? 0 : this.currentIndex;
-            if (direction === 'up') {
-                index = index <= 0 ? total - 1 : index - 1;
-            } else {
-                index = index >= total - 1 ? 0 : index + 1;
-
-            }
-            this.select(index);
-        },
-        _generateMask: function() {
-            var self = this;
-            if (this.options.trigger === 'hover') {
-                return;
-            }
-            this.$mask = $('<div class="' + this.classes.mask + '"></div>').appendTo(this.$wrapper);
-            this.$mask.on('click.asSelect', function() {
-                self.close();
-                return false;
-            });
-        },
-        _clearMask: function() {
-            if (this.options.trigger === 'hover') {
-                return;
-            }
-            this.$mask.off('click.asSelect');
-            this.$mask.remove();
-            this.$mask = null;
-        },
-        open: function() {
-            if (this.opened || this.disabled) {
-                return;
-            }
-
-            this.$select.focus();
-            this.closeAll();
-            this.$wrapper.addClass(this.classes.open);
-            this._generateMask();
-            this.keyboardEvent();
-            this.position();
-
-            this._trigger('open');
-            this.opened = true;
-        },
-        close: function() {
-            this.$wrapper.removeClass(this.classes.open);
-            this._clearMask();
-            $(document).off('keydown.select');
-            this._trigger('close');
-            this.opened = false;
-        },
-        closeAll: function() {
-            $.each(this.instances, function(key, instance) {
-                if (instance.opened) {
-                    instance.close();
-                }
-            });
-        },
-        addData: function(data) {
-            var self = this;
-            if ($.isArray(data)) {
-                $.each(data, function(i, item) {
-                    if (!item.group) {
-                        data[i].slug = self.replaceDiacritics(item.text);
-                    }
-                });
-                this.data = this.data.concat(data);
-                this.update();
-            }
-        },
-        removeData: function(data) {
-            return data;
-        },
-        enable: function() {
-            this.disabled = false;
-            this.$trigger.removeClass(this.classes.disabled);
-            return this;
-        },
-        disable: function() {
-            this.disabled = true;
-            this.$trigger.addClass(this.classes.disabled);
-            return this;
-        },
-        destroy: function() {
-            this.dettachInitEvents();
-            $(document).off('.asSelect');
-
-            this.$dropdown.remove();
-            this.$trigger.remove();
-            this.$select.unwrap().unwrap();
+          return s;
         }
-    };
-    AsSelect.defaults = {
-        namespace: 'asSelect',
-        skin: null,
-        trigger: 'click', // 'hover' or 'click'
-        offset: [0, 0], // set panel offset to trigger element
-        json: null, // if is a object,it will build from the object
-        preload: false, // preload some data set in load option
-        load: null, // preload data set here
-        maxHeight: 350, // set panel maxHeight, lists' height is bigger than maxHeight, scroll bar will show
-        select: undefined, // set initial selest value
+      }, {
+        key: 'position',
+        value: function position() {
+          var height = this.$trigger.outerHeight(true);
+          var offset = this.$trigger.offset();
+          var contentHeight = this.$dropdown.outerHeight(true);
+          var top = void 0;
 
-        render: {
-            label: function(selected) {
-                if (selected) {
-                    return selected.text;
+          if (contentHeight + offset.top > (0, _jquery2.default)(window).height() + (0, _jquery2.default)(window).scrollTop()) {
+            top = -contentHeight - parseInt(this.options.offset[0], 10);
+          } else {
+            top = height + parseInt(this.options.offset[0], 10);
+          }
+
+          this.$dropdown.css({
+            top: top
+          });
+        }
+      }, {
+        key: 'attachInitEvent',
+        value: function attachInitEvent() {
+          var that = this;
+
+          if (this.options.trigger === 'hover') {
+            this.$trigger.on('mouseenter.asSelect',
+
+              function() {
+                that.open();
+              }
+            );
+            this.$wrapper.on('mouseleave.asSelect',
+
+              function() {
+                that.close();
+
+                return false;
+              }
+            );
+          } else {
+            this.$trigger.on('click.asSelect',
+
+              function() {
+                if (that.opened) {
+                  that.close();
                 } else {
-                    return 'Choose one';
+                  that.open();
                 }
-            },
-            option: function(item) {
-                return item.text;
-            },
-            group: function(item) {
-                return item.label;
-            }
-        },
-        onChange: function() {}
-    };
-    $.fn.asSelect = function(options) {
-        if (typeof options === 'string') {
-            var method = options;
-            var method_arguments = Array.prototype.slice.call(arguments, 1);
+              }
+            );
+          }
 
-            if (/^\_/.test(method)) {
-                return false;
-            } else if ((/^(get)/.test(method))) {
-                var api = this.first().data('asSelect');
-                if (api && typeof api[method] === 'function') {
-                    return api[method].apply(api, method_arguments);
-                }
-            } else {
-                return this.each(function() {
-                    var api = $.data(this, 'asSelect');
-                    if (api && typeof api[method] === 'function') {
-                        api[method].apply(api, method_arguments);
-                    }
-                });
+          this.$select.on('focus.asSelect',
+
+            function() {
+              that.$wrapper.addClass(that.classes.focus);
+              that.inFocus = true;
             }
-        } else {
-            return this.each(function() {
-                if (!$.data(this, 'asSelect')) {
-                    $.data(this, 'asSelect', new AsSelect(this, options));
-                }
-            });
+          ).on('blur',
+
+            function() {
+              that.$wrapper.removeClass(that.classes.focus);
+              that.inFocus = false;
+            }
+          );
+
+          this.$dropdown.on('click.asSelect', '.' + this.classes.item,
+
+            function() {
+              var index = that.$items.index((0, _jquery2.default)(this));
+              that.select(index);
+              that.close();
+            }
+          );
         }
+      }, {
+        key: 'dettachInitEvents',
+        value: function dettachInitEvents() {
+          this.$trigger.off('.asSelect');
+          this.$wrap.off('.asSelect');
+          this.$select.off('.asSelect');
+          this.$dropdown.off('.asSelect');
+        }
+      }, {
+        key: 'keyboardEvent',
+        value: function keyboardEvent() {
+          var that = this;
+          (0, _jquery2.default)(document).on('keydown.asSelect',
+
+            function(e) {
+              var key = e.which || e.keycode;
+
+              if (/^(9|13|27)$/.test(key)) {
+                // close shortcut
+                that.close();
+
+                return false;
+              }
+
+              if (key < 37 || key > 40) {
+                // search
+
+                if (that.isScroll) {
+                  that.search(key);
+                }
+              } else if (/^(38|40)$/.test(key)) {
+                // key navigate
+                var direction = key === 38 ? 'up' : 'down';
+                that.navigate(direction);
+
+                return false;
+              }
+            }
+          );
+        }
+      }, {
+        key: 'search',
+        value: function search(key) {
+          var searchString = '';
+          var currentIndex = void 0;
+          clearTimeout(this.timeout);
+          searchString = new RegExp('^' + (searchString += String.fromCharCode(key)), 'i');
+          this.timeout = setTimeout(
+
+            function() {
+              searchString = '';
+            }
+            , 16);
+
+          _jquery2.default.each(this.$items,
+
+            function(index, value) {
+              /*eslint consistent-return: "off"*/
+              var string = _jquery2.default.trim((0, _jquery2.default)(value).text());
+
+              if (searchString.test(string)) {
+                currentIndex = index;
+
+                return false;
+              }
+            }
+          );
+
+          if (currentIndex >= 0) {
+            this.select(currentIndex);
+          }
+        }
+      }, {
+        key: 'scrollToVisibility',
+        value: function scrollToVisibility(index) {
+          var item = this.$items[index];
+          var scrollTop = void 0;
+          var itemHeight = (0, _jquery2.default)(item).outerHeight();
+          var oriScrollTop = this.$dropdown.scrollTop();
+          var bottom = oriScrollTop + this.$dropdown.height();
+          var distance = (0, _jquery2.default)(item).position().top;
+
+          if (distance < oriScrollTop) {
+            scrollTop = distance;
+          } else if (distance > bottom - itemHeight) {
+            scrollTop = distance + itemHeight - this.$dropdown.height();
+          } else {
+
+            return;
+          }
+          this.$dropdown.scrollTop(scrollTop);
+        }
+      }, {
+        key: 'navigate',
+        value: function navigate(direction) {
+          var total = this.total;
+          var index = this.currentIndex < 0 ? 0 : this.currentIndex;
+
+          if (direction === 'up') {
+            index = index <= 0 ? total - 1 : index - 1;
+          } else {
+            index = index >= total - 1 ? 0 : index + 1;
+          }
+          this.select(index);
+        }
+      }, {
+        key: '_generateMask',
+        value: function _generateMask() {
+          var that = this;
+
+          if (this.options.trigger === 'hover') {
+
+            return;
+          }
+          this.$mask = (0, _jquery2.default)('<div class="' + this.classes.mask + '"></div>').appendTo(this.$wrapper);
+          this.$mask.on('click.asSelect',
+
+            function() {
+              that.close();
+
+              return false;
+            }
+          );
+        }
+      }, {
+        key: '_clearMask',
+        value: function _clearMask() {
+          if (this.options.trigger === 'hover') {
+
+            return;
+          }
+          this.$mask.off('click.asSelect');
+          this.$mask.remove();
+          this.$mask = null;
+        }
+      }, {
+        key: 'open',
+        value: function open() {
+          if (this.opened || this.disabled) {
+
+            return;
+          }
+
+          this.$select.focus();
+          this.closeAll();
+          this.$wrapper.addClass(this.classes.open);
+          this._generateMask();
+          this.keyboardEvent();
+          this.position();
+
+          this._trigger('open');
+          this.opened = true;
+        }
+      }, {
+        key: 'close',
+        value: function close() {
+          this.$wrapper.removeClass(this.classes.open);
+          this._clearMask();
+          (0, _jquery2.default)(document).off('keydown.select');
+          this._trigger('close');
+          this.opened = false;
+        }
+      }, {
+        key: 'closeAll',
+        value: function closeAll() {
+          _jquery2.default.each(instances,
+
+            function(key, instance) {
+              if (instance.opened) {
+                instance.close();
+              }
+            }
+          );
+        }
+      }, {
+        key: 'addData',
+        value: function addData(data) {
+          var that = this;
+
+          if (_jquery2.default.isArray(data)) {
+            _jquery2.default.each(data,
+
+              function(i, item) {
+                if (!item.group) {
+                  data[i].slug = that.replaceDiacritics(item.text);
+                }
+              }
+            );
+            this.data = this.data.concat(data);
+            this.update();
+          }
+        }
+      }, {
+        key: 'removeData',
+        value: function removeData(data) {
+          return data;
+        }
+      }, {
+        key: 'enable',
+        value: function enable() {
+          this.disabled = false;
+          this.$trigger.removeClass(this.classes.disabled);
+          this._trigger('enable');
+
+          return this;
+        }
+      }, {
+        key: 'disable',
+        value: function disable() {
+          this.disabled = true;
+          this.$trigger.addClass(this.classes.disabled);
+          this._trigger('disable');
+
+          return this;
+        }
+      }, {
+        key: 'destroy',
+        value: function destroy() {
+          this.dettachInitEvents();
+          (0, _jquery2.default)(document).off('.asSelect');
+
+          this.$dropdown.remove();
+          this.$trigger.remove();
+          this.$select.unwrap().unwrap();
+          this._trigger('destroy');
+        }
+      }], [{
+        key: 'setDefaults',
+        value: function setDefaults(options) {
+          _jquery2.default.extend(DEFAULTS, _jquery2.default.isPlainObject(options) && options);
+        }
+      }]);
+
+      return asSelect;
+    }();
+
+    var info = {
+      version: '0.2.0'
     };
-}(jQuery));
+
+    var NAMESPACE = 'asSelect';
+    var OtherAsScrollbar = _jquery2.default.fn.asSelect;
+
+    var jQueryasSelect = function jQueryasSelect(options) {
+      var _this3 = this;
+
+      for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        args[_key2 - 1] = arguments[_key2];
+      }
+
+      if (typeof options === 'string') {
+        var _ret2 = function() {
+          var method = options;
+
+          if (/^_/.test(method)) {
+
+            return {
+              v: false
+            };
+          } else if (/^(get)/.test(method)) {
+            var instance = _this3.first().data(NAMESPACE);
+
+            if (instance && typeof instance[method] === 'function') {
+
+              return {
+                v: instance[method].apply(instance, args)
+              };
+            }
+          } else {
+
+            return {
+              v: _this3.each(
+
+                function() {
+                  var instance = _jquery2.default.data(this, NAMESPACE);
+
+                  if (instance && typeof instance[method] === 'function') {
+                    instance[method].apply(instance, args);
+                  }
+                }
+              )
+            };
+          }
+        }();
+
+        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object")
+
+          return _ret2.v;
+      }
+
+      return this.each(
+
+        function() {
+          if (!(0, _jquery2.default)(this).data(NAMESPACE)) {
+            (0, _jquery2.default)(this).data(NAMESPACE, new asSelect(this, options));
+          }
+        }
+      );
+    };
+
+    _jquery2.default.fn.asSelect = jQueryasSelect;
+
+    _jquery2.default.asSelect = _jquery2.default.extend({
+      setDefaults: asSelect.setDefaults,
+      noConflict: function noConflict() {
+        _jquery2.default.fn.asSelect = OtherAsScrollbar;
+
+        return jQueryasSelect;
+      }
+    }, info);
+  }
+);
