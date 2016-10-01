@@ -1,6 +1,6 @@
 {
   "name": "jquery-asSelect",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A jquery plugin that make a select more functional.",
   "main": "dist/jquery-asSelect.js",
   "copyright": "amazingSurge",

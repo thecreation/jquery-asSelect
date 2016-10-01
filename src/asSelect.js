@@ -7,7 +7,7 @@ let instances = [];
  * Plugin constructor
  **/
 class asSelect {
-  constructor(element, options) {
+  constructor(element, options = {}) {
     this.element = element;
     this.$select = $(element);
 
@@ -602,7 +602,7 @@ class asSelect {
   }
 
   static setDefaults(options) {
-    $.extend(DEFAULTS, $.isPlainObject(options) && options);
+    $.extend(true, DEFAULTS, $.isPlainObject(options) && options);
   }
 }
 export default asSelect;

@@ -1,5 +1,5 @@
 /**
-* jQuery asSelect v0.2.0
+* jQuery asSelect v0.2.1
 * https://github.com/amazingSurge/jquery-asSelect
 *
 * Copyright (c) amazingSurge
@@ -44,7 +44,7 @@ let instances = [];
  * Plugin constructor
  **/
 class asSelect {
-  constructor(element, options) {
+  constructor(element, options = {}) {
     this.element = element;
     this.$select = $(element);
 
@@ -639,12 +639,12 @@ class asSelect {
   }
 
   static setDefaults(options) {
-    $.extend(DEFAULTS, $.isPlainObject(options) && options);
+    $.extend(true, DEFAULTS, $.isPlainObject(options) && options);
   }
 }
 
 var info = {
-  version:'0.2.0'
+  version:'0.2.1'
 };
 
 const NAMESPACE = 'asSelect';
