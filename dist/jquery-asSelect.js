@@ -1,5 +1,5 @@
 /**
-* jQuery asSelect v0.2.1
+* jQuery asSelect v0.2.2
 * https://github.com/amazingSurge/jquery-asSelect
 *
 * Copyright (c) amazingSurge
@@ -124,7 +124,7 @@
         _jquery2.default.each(this.$select.data(),
 
           function(k, v) {
-            var re = new RegExp("^asSelect", "i");
+            var re = new RegExp('^' + NAMESPACE$1, "i");
 
             if (re.test(k)) {
               metas[k.toLowerCase().replace(re, '')] = v;
@@ -218,13 +218,11 @@
       }, {
         key: '_trigger',
         value: function _trigger(eventType) {
-          var _ref;
-
           for (var _len = arguments.length, params = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
             params[_key - 1] = arguments[_key];
           }
 
-          var data = (_ref = [this]).concat.apply(_ref, params);
+          var data = [this].concat(params);
 
           // event
           this.$select.trigger(NAMESPACE$1 + '::' + eventType, data);
@@ -239,9 +237,7 @@
           var onFunction = 'on' + eventType;
 
           if (typeof this.options[onFunction] === 'function') {
-            var _options$onFunction;
-
-            (_options$onFunction = this.options[onFunction]).apply.apply(_options$onFunction, [this].concat(params));
+            this.options[onFunction].apply(this, params);
           }
         }
       }, {
@@ -471,7 +467,7 @@
 
           if (this.last !== this.currentIndex) {
             // pass source data object
-            this._trigger('change', [this.getCurrentData(index).value]);
+            this._trigger('change', this.getCurrentData(index).value);
           }
         }
       }, {
@@ -902,13 +898,13 @@
     }();
 
     var info = {
-      version: '0.2.1'
+      version: '0.2.2'
     };
 
     var NAMESPACE = 'asSelect';
-    var OtherAsScrollbar = _jquery2.default.fn.asSelect;
+    var OtherAsSelect = _jquery2.default.fn.asSelect;
 
-    var jQueryasSelect = function jQueryasSelect(options) {
+    var jQueryAsSelect = function jQueryAsSelect(options) {
       var _this3 = this;
 
       for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
@@ -965,14 +961,14 @@
       );
     };
 
-    _jquery2.default.fn.asSelect = jQueryasSelect;
+    _jquery2.default.fn.asSelect = jQueryAsSelect;
 
     _jquery2.default.asSelect = _jquery2.default.extend({
       setDefaults: asSelect.setDefaults,
       noConflict: function noConflict() {
-        _jquery2.default.fn.asSelect = OtherAsScrollbar;
+        _jquery2.default.fn.asSelect = OtherAsSelect;
 
-        return jQueryasSelect;
+        return jQueryAsSelect;
       }
     }, info);
   }

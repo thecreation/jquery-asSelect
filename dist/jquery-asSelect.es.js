@@ -1,5 +1,5 @@
 /**
-* jQuery asSelect v0.2.1
+* jQuery asSelect v0.2.2
 * https://github.com/amazingSurge/jquery-asSelect
 *
 * Copyright (c) amazingSurge
@@ -51,7 +51,7 @@ class asSelect {
     // options
     const metas = [];
     $.each(this.$select.data(), (k, v) => {
-      const re = new RegExp("^asSelect", "i");
+      const re = new RegExp(`^${NAMESPACE$1}`, "i");
       if (re.test(k)) {
         metas[k.toLowerCase().replace(re, '')] = v;
       }
@@ -140,7 +140,7 @@ class asSelect {
   }
 
   _trigger(eventType, ...params) {
-    let data = [this].concat(...params);
+    let data = [this].concat(params);
 
     // event
     this.$select.trigger(`${NAMESPACE$1}::${eventType}`, data);
@@ -152,7 +152,7 @@ class asSelect {
     let onFunction = `on${eventType}`;
 
     if (typeof this.options[onFunction] === 'function') {
-      this.options[onFunction].apply(this, ...params);
+      this.options[onFunction].apply(this, params);
     }
   }
 
@@ -332,7 +332,7 @@ class asSelect {
 
     if (this.last !== this.currentIndex) {
       // pass source data object
-      this._trigger('change', [this.getCurrentData(index).value]);
+      this._trigger('change', this.getCurrentData(index).value);
     }
   }
 
@@ -644,13 +644,13 @@ class asSelect {
 }
 
 var info = {
-  version:'0.2.1'
+  version:'0.2.2'
 };
 
 const NAMESPACE = 'asSelect';
-const OtherAsScrollbar = $.fn.asSelect;
+const OtherAsSelect = $.fn.asSelect;
 
-const jQueryasSelect = function(options, ...args) {
+const jQueryAsSelect = function(options, ...args) {
   if (typeof options === 'string') {
     const method = options;
 
@@ -678,12 +678,12 @@ const jQueryasSelect = function(options, ...args) {
   });
 };
 
-$.fn.asSelect = jQueryasSelect;
+$.fn.asSelect = jQueryAsSelect;
 
 $.asSelect = $.extend({
   setDefaults: asSelect.setDefaults,
   noConflict: function() {
-    $.fn.asSelect = OtherAsScrollbar;
-    return jQueryasSelect;
+    $.fn.asSelect = OtherAsSelect;
+    return jQueryAsSelect;
   }
 }, info);

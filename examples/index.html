@@ -142,28 +142,27 @@
                 skin: 'simple',
                 offset: [0, 0],
               });
-              $('.custom-select').on('asSelect::trigger', function(event, data) {
+              $('.custom-select').on('asSelect::trigger', function(event, api) {
                 var text = event.type + ': triggered';
                 $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
               });
-              $('.custom-select').on('asSelect::change', function(event, data) {
-                console.log(data)
-                var text = event.type + ': triggered;' + ' value: ' + data.value;
+              $('.custom-select').on('asSelect::change', function(event, api, value) {
+                var text = event.type + ': triggered;' + ' value: ' + value;
                 $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
               });
-              $('.custom-select').on('asSelect::open', function(event, data) {
+              $('.custom-select').on('asSelect::open', function(event, api) {
                 var text = event.type + ': triggered';
                 $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
               });
-              $('.custom-select').on('asSelect::close', function(event, data) {
+              $('.custom-select').on('asSelect::close', function(event, api) {
                 var text = event.type + ': triggered';
                 $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
               });
-              $('.custom-select').on('asSelect::option::mouseenter', function(event, data) {
+              $('.custom-select').on('asSelect::option::mouseenter', function(event, api) {
                 var text = event.type + ': triggered';
                 $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
               });
-              $('.custom-select').on('asSelect::option::mouseleave', function(event, data) {
+              $('.custom-select').on('asSelect::option::mouseleave', function(event, api) {
                 var text = event.type + ': triggered';
                 $('<div>' + text + '</div>').prependTo($('.consoleEvent'));
               });

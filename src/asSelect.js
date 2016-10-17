@@ -14,7 +14,7 @@ class asSelect {
     // options
     const metas = [];
     $.each(this.$select.data(), (k, v) => {
-      const re = new RegExp("^asSelect", "i");
+      const re = new RegExp(`^${NAMESPACE}`, "i");
       if (re.test(k)) {
         metas[k.toLowerCase().replace(re, '')] = v;
       }
@@ -103,7 +103,7 @@ class asSelect {
   }
 
   _trigger(eventType, ...params) {
-    let data = [this].concat(...params);
+    let data = [this].concat(params);
 
     // event
     this.$select.trigger(`${NAMESPACE}::${eventType}`, data);
@@ -115,7 +115,7 @@ class asSelect {
     let onFunction = `on${eventType}`;
 
     if (typeof this.options[onFunction] === 'function') {
-      this.options[onFunction].apply(this, ...params);
+      this.options[onFunction].apply(this, params);
     }
   }
 
@@ -295,7 +295,7 @@ class asSelect {
 
     if (this.last !== this.currentIndex) {
       // pass source data object
-      this._trigger('change', [this.getCurrentData(index).value]);
+      this._trigger('change', this.getCurrentData(index).value);
     }
   }
 

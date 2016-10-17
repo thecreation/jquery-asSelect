@@ -3,9 +3,9 @@ import asSelect from './asSelect';
 import info from './info';
 
 const NAMESPACE = 'asSelect';
-const OtherAsScrollbar = $.fn.asSelect;
+const OtherAsSelect = $.fn.asSelect;
 
-const jQueryasSelect = function(options, ...args) {
+const jQueryAsSelect = function(options, ...args) {
   if (typeof options === 'string') {
     const method = options;
 
@@ -33,12 +33,12 @@ const jQueryasSelect = function(options, ...args) {
   });
 };
 
-$.fn.asSelect = jQueryasSelect;
+$.fn.asSelect = jQueryAsSelect;
 
 $.asSelect = $.extend({
   setDefaults: asSelect.setDefaults,
   noConflict: function() {
-    $.fn.asSelect = OtherAsScrollbar;
-    return jQueryasSelect;
+    $.fn.asSelect = OtherAsSelect;
+    return jQueryAsSelect;
   }
 }, info);
