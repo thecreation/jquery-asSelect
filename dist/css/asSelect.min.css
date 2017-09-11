@@ -1,8 +1,9 @@
 /**
-* jQuery asSelect v0.2.2
+* jQuery asSelect v0.2.3
 * https://github.com/amazingSurge/jquery-asSelect
 *
 * Copyright (c) amazingSurge
 * Released under the LGPL-3.0 license
 */
 .asSelect-wrapper{position:relative;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.asSelect-wrapper .asSelect-mask{position:fixed;top:0;left:0;width:100%;height:100%}.asSelect_disabled{cursor:default;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.asSelect-old{position:relative;overflow:hidden}.asSelect-old select{position:absolute;left:-100%}.asSelect-label{overflow:hidden;white-space:nowrap}.asSelect-dropdown{position:absolute;top:100%;left:0;display:none;overflow:auto}.asSelect-dropdown>ul{position:relative}.asSelect_open .asSelect-dropdown{display:block}.asSelect-dropdown li,.asSelect-dropdown ul{list-style:none}.asSelect-dropdown li{position:relative;display:block;cursor:pointer}.asSelect-wrapper{width:300px;margin:0 0 10px}.asSelect_disabled{filter:alpha(opacity=50);opacity:.5}.asSelect_open .asSelect-dropdown{z-index:9999;width:297px}.asSelect-trigger{background:#fafafa;border:1px solid #ccc;border-radius:3px}.asSelect_open .asSelect-trigger{z-index:9999;background:#f5f5f5;border-color:#bbb}.asSelect-label{padding:6px;margin:0 30px 0 0;font-size:12px;line-height:1.5;color:#555}.asSelect-wrapper:hover .asSelect-trigger{border-color:#bbb}.asSelect-dropdown li,.asSelect-dropdown ul{min-height:20px;padding:0;margin:0;font-size:12px;line-height:20px}.asSelect-dropdown{z-index:9998;background:#fcfcfc;border:1px solid #ccc;-webkit-box-shadow:0 0 10px -6px;box-shadow:0 0 10px -6px}.asSelect-dropdown li.asSelect-item{padding:5px;color:#666;border-top:1px solid #fff;border-bottom:1px solid #eee}.asSelect-group-label{padding:3px;font-weight:700;background-color:#f0f0f0}.asSelect-dropdown li.asSelect_selected{color:#444;background:#efefef;border-top-color:#eee}.asSelect-dropdown li.asSelect-item:hover{color:#444;background:#f5f5f5}
+/*# sourceMappingURL=asSelect.min.css.map */

@@ -1,5 +1,5 @@
 /**
-* jQuery asSelect v0.2.2
+* jQuery asSelect v0.2.3
 * https://github.com/amazingSurge/jquery-asSelect
 *
 * Copyright (c) amazingSurge
@@ -644,7 +644,7 @@ class asSelect {
 }
 
 var info = {
-  version:'0.2.2'
+  version:'0.2.3'
 };
 
 const NAMESPACE = 'asSelect';
